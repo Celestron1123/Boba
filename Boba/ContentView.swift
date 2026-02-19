@@ -103,13 +103,9 @@ struct ContentView: View {
                 }
             
             // Tab 3: Calendar placeholder
-            VStack(spacing: 16) {
-                Text("Calendar")
-                    .font(.title)
-                Text("Calendar view coming soon")
-                    .foregroundStyle(.secondary)
+            NavigationStack {
+                CalendarView()
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .tabItem {
                 Label("Calendar", systemImage: "calendar")
             }
@@ -117,6 +113,27 @@ struct ContentView: View {
     }
 }
 
+struct CalendarView: View {
+    @State private var selectedDate = Date()
+
+    var body: some View {
+        VStack {
+            DatePicker(
+                "Select Date",
+                selection: $selectedDate,
+                displayedComponents: [.date]
+            )
+            .datePickerStyle(.graphical)
+            .labelsHidden()
+            .padding()
+
+            Spacer()
+        }
+        .navigationTitle("Calendar")
+    }
+}
+
 #Preview {
     ContentView()
+    CalendarView()
 }
