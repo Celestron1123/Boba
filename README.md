@@ -55,7 +55,7 @@ By synchronizing emotional data in real-time, Boba transforms therapy from a rea
 * **Daniel Aldous**
 
 ## 📄 License
-Distributed under the MIT License. See `LICENSE` for more information.
+See `LICENSE` for information.
 
 ## 🎓 Acknowledgements
 * Icons provided by **SF Symbols**.
