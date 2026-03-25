@@ -82,3 +82,6 @@ iOSInjectionProject/
 
 # user info
 *.xcuserdatad/
+
+# Firebase info
+GoogleService-Info*.plist
