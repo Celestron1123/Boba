@@ -1,7 +1,8 @@
 import SwiftUI
 
 struct HomeDashboardView: View {
-    @State private var tabIndex = 0
+
+    @State private var showDailyLog = false
 
     var body: some View {
         ZStack {
@@ -35,11 +36,9 @@ struct HomeDashboardView: View {
                 }
             }
             
-            VStack {
-                Spacer()
-                BottomNavBar(selectedIndex: $tabIndex)
-                    .padding(.bottom, 32)
-            }
+        }
+        .sheet(isPresented: $showDailyLog) {
+            DailyLogView()
         }
     }
     
@@ -88,7 +87,7 @@ struct HomeDashboardView: View {
                 moodButton(icon: "cloud.rain", label: "Sad")
             }
             
-            Button("Check in Now") {}
+            Button("Check in Now") { showDailyLog = true }
                 .headlineText(size: 16, weight: .bold)
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
@@ -227,3 +226,4 @@ struct HomeDashboardView: View {
         .shadow(color: .black.opacity(0.05), radius: 20, x: 0, y: 10)
     }
 }
+

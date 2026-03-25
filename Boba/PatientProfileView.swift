@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct PatientProfileView: View {
-    @State private var tabIndex = 3
     var body: some View {
         ZStack {
             Color.themeSurface.ignoresSafeArea()
@@ -23,12 +22,6 @@ struct PatientProfileView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                 }
-            }
-            
-            VStack {
-                Spacer()
-                BottomNavBar(selectedIndex: $tabIndex)
-                    .padding(.bottom, 32)
             }
         }
     }
@@ -291,3 +284,4 @@ struct PatientProfileView: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.themeOutlineVariant.opacity(0.1), lineWidth: 1))
     }
 }
+

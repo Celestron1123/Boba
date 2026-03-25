@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct DailyLogView: View {
-    @State private var tabIndex = 1
     
     var body: some View {
         ZStack {
@@ -40,12 +39,6 @@ struct DailyLogView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                 }
-            }
-            
-            VStack {
-                Spacer()
-                BottomNavBar(selectedIndex: $tabIndex)
-                    .padding(.bottom, 32)
             }
         }
     }

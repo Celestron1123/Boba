@@ -5,7 +5,6 @@ struct AppointmentsView: View {
     let dates = Array(1...12)
     @State private var selectedDate = 3
     @State private var selectedTime = "10:00 AM"
-    @State private var tabIndex = 1
 
     var body: some View {
         ZStack {
@@ -42,12 +41,6 @@ struct AppointmentsView: View {
                     .padding(.horizontal, 24)
                     .padding(.top, 24)
                 }
-            }
-            
-            VStack {
-                Spacer()
-                BottomNavBar(selectedIndex: $tabIndex)
-                    .padding(.bottom, 32)
             }
         }
     }
@@ -215,3 +208,4 @@ struct AppointmentsView: View {
         .padding(.top, 8)
     }
 }
+
