@@ -1,0 +1,35 @@
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import TherapistRoute from './components/TherapistRoute'
+import Index from './pages/Index'
+import Patients from './pages/Patients'
+import PatientShow from './pages/PatientShow'
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route
+            path="/patients"
+            element={
+              <TherapistRoute>
+                <Patients />
+              </TherapistRoute>
+            }
+          />
+          <Route
+            path="/patients/:patientId"
+            element={
+              <TherapistRoute>
+                <PatientShow />
+              </TherapistRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  )
+}
