@@ -29,6 +29,7 @@ struct TopAppBar: View {
         .background(
             Color.themeSurface.opacity(0.7)
                 .background(.ultraThinMaterial)
+                .ignoresSafeArea(edges: .top)
         )
     }
 }
