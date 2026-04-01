@@ -1,6 +1,13 @@
 import SwiftUI
+import FirebaseFirestore
 
 struct DailyLogView: View {
+    @State private var selectedMood: String = ""
+    //@State private var selectedTags: Set<String> = [] // Set avoids duplicates
+    @State private var journalText: String = ""
+    //@State private var hydrationLevel: Double = 1.2
+    //@State private var sleepHours: Double = 7.5
+    @State private var isSubmitting: Bool = false
     
     var body: some View {
         ZStack {
@@ -23,7 +30,9 @@ struct DailyLogView: View {
                         trackersSection
                         noteSection
                         
-                        Button(action: {}) {
+                        Button(action: {
+                            submitLog()
+                        }) {
                             Text("Submit Daily Log")
                                 .headlineText(size: 18, weight: .heavy)
                                 .foregroundColor(.white)
@@ -32,7 +41,7 @@ struct DailyLogView: View {
                                 .background(Color.primaryGradient)
                                 .clipShape(Capsule())
                                 .shadow(color: .themePrimary.opacity(0.2), radius: 20, x: 0, y: 10)
-                        }
+                        }.disabled(isSubmitting)
                         
                         Spacer().frame(height: 120)
                     }
@@ -211,6 +220,43 @@ struct DailyLogView: View {
                     .foregroundColor(.themeOnSurfaceVariant.opacity(0.4))
                     .padding(16)
             }
+        }
+    }
+}
+
+extension DailyLogView {
+    func submitLog() {
+        // Prevent double-submissions
+        guard !isSubmitting else { return }
+        isSubmitting = true
+        
+        let newLog = DailyLog(
+            date: Date(),
+            mood: selectedMood,
+            //tags: Array(selectedTags), // Convert Set back to Array for Firebase
+            //hydration: hydrationLevel,
+            //sleep: sleepHours,
+            notes: journalText
+        )
+        
+        // 2. Reference your Firestore database
+        let db = Firestore.firestore()
+        
+        // 3. Push to a collection named "daily_logs"
+        do {
+            try db.collection("logs").addDocument(from: newLog) { error in
+                isSubmitting = false
+                if let error = error {
+                    print("Error saving log: \(error.localizedDescription)")
+                    // Handle error (e.g., show an alert)
+                } else {
+                    print("Successfully saved daily log!")
+                    // Handle success (e.g., clear the form or dismiss the view)
+                }
+            }
+        } catch {
+            print("Error encoding log: \(error)")
+            isSubmitting = false
         }
     }
 }
