@@ -1,3 +1,8 @@
+/* This file was written by Claude 3.7 Sonnet 
+This file is the CSS for the index page of the application
+It includes flex box direction as well to center the content
+*/
+
 .index-page {
   flex: 1;
   display: flex;

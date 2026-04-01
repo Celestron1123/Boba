@@ -2,6 +2,9 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import './Index.css'
 
+// This file was written by Claude 3.7 Sonnet
+// it essentially renders the index page of the application
+
 export default function Index() {
   const navigate = useNavigate()
   const { loginAsTherapist } = useAuth()

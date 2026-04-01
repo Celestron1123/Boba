@@ -1,3 +1,6 @@
+// This file was written by Claude 3.7 Sonnet
+// it essentially renders the app of the application
+
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import TherapistRoute from './components/TherapistRoute'

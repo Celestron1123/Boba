@@ -1,3 +1,8 @@
+/** 
+This file was written by Claude 3.7 Sonnet
+it essentially renders the patient show page of the application
+*/ 
+
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { getPatientById } from '../data/patients'
 import './PatientShow.css'

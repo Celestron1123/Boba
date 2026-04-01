@@ -1,3 +1,9 @@
+/** 
+This file was written by Claude 3.7 Sonnet
+It is the data for the patients of the application
+*/ 
+
+
 /**
  * Static fallback for local dev. Replace with Firebase-backed loading in the UI layer.
  *
