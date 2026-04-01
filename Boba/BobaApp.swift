@@ -6,8 +6,8 @@
 //
 
 import SwiftUI
-//import FirebaseCore
-//import FirebaseFirestore
+import FirebaseCore
+import FirebaseFirestore
 
 // connecting Boba to firebase
 class AppDelegate: NSObject, UIApplicationDelegate {
