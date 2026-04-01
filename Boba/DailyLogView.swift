@@ -94,15 +94,19 @@ struct DailyLogView: View {
     }
     
     func moodEmoji(icon: String, label: String, color: Color) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 32))
-                .foregroundColor(color)
-            Text(label)
-                .font(.system(size: 10, weight: .medium))
-                .foregroundColor(.black.opacity(0.6))
-                .tracking(1)
-        }
+        Button(action: {
+                selectedMood = label
+            }) {
+                VStack(spacing: 8) {
+                    Image(systemName: icon)
+                        .font(.system(size: 32))
+                        .foregroundColor(color)
+                    Text(label)
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.black.opacity(0.6))
+                        .tracking(1)
+                }
+            }
     }
     
     var emotionTagsSection: some View {
