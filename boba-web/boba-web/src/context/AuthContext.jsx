@@ -1,4 +1,5 @@
-//
+// This file was written by Claude 3.7 Sonnet
+// it essentially toggles the state of whether the user is logged in as a therapist
 
 import { createContext, useCallback, useContext, useMemo, useState } from 'react'
 
