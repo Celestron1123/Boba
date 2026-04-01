@@ -1,4 +1,6 @@
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 struct AppointmentsView: View {
     let days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
@@ -85,6 +87,11 @@ struct AppointmentsView: View {
         .cornerRadius(24)
         .shadow(color: .themeOnSurface.opacity(0.06), radius: 32, x: 0, y: 12)
     }
+    
+    //var upcomingAppointments: some View {
+        /// TO: DO
+        /// Appointment information will be pulled from database
+    //}
     
     var calendarSection: some View {
         VStack(spacing: 16) {
@@ -190,7 +197,9 @@ struct AppointmentsView: View {
     
     var ctaSection: some View {
         VStack(spacing: 16) {
-            Button(action: {}) {
+            Button(action: {
+                scheduleAppointment()
+            }) {
                 Text("Schedule Appointment")
                     .headlineText(size: 18, weight: .bold)
                     .foregroundColor(.white)
@@ -207,5 +216,29 @@ struct AppointmentsView: View {
         }
         .padding(.top, 8)
     }
+    
+    func scheduleAppointment(){
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        let data: [String: Any] = [
+                    "patientId": uid,
+                    "date": selectedDate,
+                    "time": selectedTime,
+                    "practitioner": "Dr. Smith",
+                    "status": "pending"
+                ]
+        
+        db.collection("appointments").addDocument(data: data){ error in
+            if let error = error{
+                print("Error: \(error.localizedDescription)")
+            }
+            else {
+                print("Appt booked for \(selectedTime)!")
+            }
+        }
+        
+    }
 }
+
+    
 
