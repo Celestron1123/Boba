@@ -137,7 +137,6 @@ struct PatientProfileView: View {
         }
         .padding(32)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.2), lineWidth: 1))
     }
     
     var emergencyContactCard: some View {
@@ -204,7 +203,6 @@ struct PatientProfileView: View {
         }
         .padding(32)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.2), lineWidth: 1))
     }
     
     func medicationRow(name: String, details: String, status: String, statusColor: Color) -> some View {
@@ -265,7 +263,6 @@ struct PatientProfileView: View {
         }
         .padding(32)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.2), lineWidth: 1))
     }
     
     func diagnosisTag(name: String, date: String) -> some View {
