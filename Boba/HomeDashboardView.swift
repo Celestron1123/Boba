@@ -98,7 +98,6 @@ struct HomeDashboardView: View {
         }
         .padding(32)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.2), lineWidth: 1))
     }
     
     func moodButton(icon: String, label: String) -> some View {
@@ -154,7 +153,6 @@ struct HomeDashboardView: View {
         }
         .padding(24)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.2), lineWidth: 1))
     }
     
     var medicationRemindersCard: some View {
@@ -169,7 +167,6 @@ struct HomeDashboardView: View {
         }
         .padding(24)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.white.opacity(0.2), lineWidth: 1))
     }
     
     func medicationRow(name: String, time: String, details: String, icon: String, color: Color) -> some View {
