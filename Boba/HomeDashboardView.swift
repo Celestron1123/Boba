@@ -78,13 +78,15 @@ struct HomeDashboardView: View {
             }
             
             HStack(spacing: 0) {
-                moodButton(icon: "face.smiling", label: "Happy")
+                moodButton(icon: "face.terrible", label: "Awful", isCustom: true, color: .moodTerrible)
                 Spacer()
-                moodButton(icon: "face.dashed", label: "Calm")
+                moodButton(icon: "face.sad", label: "Bad", isCustom: true, color: .moodBad)
                 Spacer()
-                moodButton(icon: "waveform.path.ecg", label: "Anxious")
+                moodButton(icon: "face.okay", label: "Okay", isCustom: true, color: .moodOkay)
                 Spacer()
-                moodButton(icon: "cloud.rain", label: "Sad")
+                moodButton(icon: "face.good", label: "Good", isCustom: true, color: .moodGood)
+                Spacer()
+                moodButton(icon: "face.great", label: "Great", isCustom: true, color: .moodGreat)
             }
             
             Button("Check in Now") { showDailyLog = true }
@@ -100,13 +102,18 @@ struct HomeDashboardView: View {
         .glassCard()
     }
     
-    func moodButton(icon: String, label: String) -> some View {
+    func moodButton(icon: String, label: String, isCustom: Bool = false, color: Color) -> some View {
         VStack(spacing: 8) {
             Circle()
-                .fill(Color.themeSurfaceContainerHigh)
+                .fill(color)
                 .frame(width: 56, height: 56)
-                .overlay(Image(systemName: icon).font(.system(size: 24)).foregroundColor(.themeOnSurfaceVariant))
-            
+                .overlay(
+                    // Dynamically choose the correct Image initializer
+                    (isCustom ? Image(icon) : Image(systemName: icon))
+                        .font(.system(size: 24))
+                        .foregroundColor(.themeOnSurfaceVariant)
+                )
+                
             Text(label)
                 .bodyText(size: 12, weight: .medium)
                 .foregroundColor(.themeOnSurfaceVariant)
