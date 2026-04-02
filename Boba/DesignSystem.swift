@@ -52,6 +52,13 @@ extension Color {
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
+    
+    // Mood colors
+    static let moodTerrible = Color(hex: "ffcac8")
+    static let moodBad = Color(hex: "fbcfb5")
+    static let moodOkay = Color(hex: "efd5ad")
+    static let moodGood = Color(hex: "e2dbad")
+    static let moodGreat = Color(hex: "d2e0b4")
 }
 
 // Utility to construct Color values from hex strings (RGB/ARGB)
