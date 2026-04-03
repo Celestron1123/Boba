@@ -7,7 +7,7 @@ struct AppointmentsView: View {
     let dates = Array(1...12)
     @State private var selectedDate = 3
     @State private var selectedTime = "10:00 AM"
-
+    
     var body: some View {
         ZStack {
             Color.themeSurface.ignoresSafeArea()
@@ -83,9 +83,8 @@ struct AppointmentsView: View {
             Spacer()
         }
         .padding(24)
-        .background(Color.themeSurfaceContainerLow)
-        .cornerRadius(24)
-        .shadow(color: .themeOnSurface.opacity(0.06), radius: 32, x: 0, y: 12)
+        .glassEffect(.regular.tint(Color.themeSurface.opacity(0.2)).interactive(), in: .rect(cornerRadius: DS.Radius.lg))
+        .shadow(color: DS.Shadow.card.color, radius: DS.Shadow.card.radius, x: DS.Shadow.card.x, y: DS.Shadow.card.y)
     }
     
     //var upcomingAppointments: some View {
@@ -146,7 +145,6 @@ struct AppointmentsView: View {
         }
         .padding(24)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.themeOutlineVariant.opacity(0.15), lineWidth: 1))
     }
     
     var timeSlotsSection: some View {
@@ -187,8 +185,10 @@ struct AppointmentsView: View {
                     .foregroundColor(.themeOnSurface)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.themeSurface.opacity(0.7).background(.ultraThinMaterial))
-                    .cornerRadius(12)
+                //                    .background(Color.themeSurface.opacity(0.7).background(.ultraThinMaterial))
+                //                    .cornerRadius(12)
+                    .glassEffect(.regular.tint(Color.themeSurface.opacity(0.2)).interactive(),
+                                 in: .rect(cornerRadius: DS.Radius.md))
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.4), lineWidth: 1))
                     .opacity(0.4)
             }
