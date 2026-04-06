@@ -85,3 +85,6 @@ iOSInjectionProject/
 
 # Firebase info
 GoogleService-Info*.plist
+
+.vite
+.env
