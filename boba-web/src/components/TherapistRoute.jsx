@@ -2,7 +2,7 @@
 // it essentially renders the children only when the user is logged in as a therapist
 
 import { Navigate, useLocation } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { useAuth } from '../context/useAuth'
 
 /** Renders `children` only when logged in as therapist; otherwise redirects home. */
 export default function TherapistRoute({ children }) {

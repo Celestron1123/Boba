@@ -1,0 +1,337 @@
+.patient-dashboard-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px 20px 48px;
+  box-sizing: border-box;
+}
+
+.patient-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 28px;
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg, rgba(170, 59, 255, 0.14), rgba(255, 255, 255, 0)),
+    linear-gradient(180deg, var(--bg), rgba(244, 243, 236, 0.7));
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.patient-eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.patient-dashboard-title {
+  margin: 0 0 12px;
+}
+
+.patient-summary {
+  max-width: 60ch;
+}
+
+.patient-switch-btn,
+.patient-toggle-btn,
+.check-in-secondary-btn {
+  font: inherit;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: 10px 18px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.patient-overview-grid,
+.patient-content-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.patient-overview-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.patient-content-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.patient-card,
+.patient-panel {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px;
+  background: var(--bg);
+  text-align: left;
+  box-shadow: var(--shadow);
+}
+
+.patient-card-emphasis {
+  background: linear-gradient(180deg, var(--accent-bg), var(--bg));
+}
+
+.patient-card h2,
+.patient-panel h2 {
+  margin-bottom: 14px;
+}
+
+.patient-card-value {
+  font-size: 22px;
+  color: var(--text-h);
+  margin-bottom: 6px;
+}
+
+.patient-card-meta,
+.patient-list-meta {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.patient-dashboard-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.patient-dashboard-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--text-h);
+}
+
+.patient-dashboard-list li::before {
+  content: '•';
+  color: var(--accent);
+  margin-right: 8px;
+}
+
+.patient-dashboard-list li > span:first-child {
+  flex: 1;
+}
+
+.patient-dashboard-list li.is-complete {
+  opacity: 0.7;
+}
+
+.patient-mood-trend {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 140px;
+}
+
+.patient-mood-bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+
+.patient-mood-bar {
+  width: 100%;
+  max-width: 40px;
+  border-radius: 999px 999px 10px 10px;
+  background: linear-gradient(180deg, var(--accent), rgba(170, 59, 255, 0.3));
+  min-height: 18px;
+}
+
+.patient-panel-wide {
+  grid-column: 1 / -1;
+}
+
+.patient-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.patient-panel-heading h2,
+.patient-log-card h3 {
+  margin: 0;
+}
+
+.patient-panel-copy,
+.patient-empty-state,
+.check-in-status {
+  color: var(--text);
+}
+
+.patient-checkin-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.patient-checkin-pill-complete {
+  background: rgba(28, 168, 107, 0.14);
+  color: #1c7c50;
+}
+
+.check-in-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.check-in-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.check-in-field label,
+.check-in-fieldset legend {
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+.check-in-field input,
+.check-in-field textarea {
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.check-in-field textarea {
+  resize: vertical;
+  min-height: 124px;
+}
+
+.check-in-fieldset {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.check-in-mood-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.check-in-mood-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  background: var(--bg);
+}
+
+.check-in-mood-option input {
+  margin: 0;
+}
+
+.check-in-mood-emoji,
+.patient-log-emoji {
+  font-size: 20px;
+}
+
+.check-in-error {
+  color: #c2410c;
+}
+
+.check-in-submit-btn {
+  font: inherit;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+
+.check-in-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.check-in-secondary-btn {
+  padding: 12px 18px;
+}
+
+.check-in-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.patient-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.patient-log-card {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  background: linear-gradient(180deg, rgba(244, 243, 236, 0.5), var(--bg));
+}
+
+.patient-log-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.patient-log-mood {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .patient-hero {
+    flex-direction: column;
+  }
+
+  .patient-overview-grid,
+  .patient-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .patient-panel-wide {
+    grid-column: auto;
+  }
+
+  .patient-panel-heading,
+  .patient-log-header {
+    flex-direction: column;
+  }
+}
