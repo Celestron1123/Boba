@@ -30,6 +30,18 @@ It includes flex box direction as well to center the content
   transition: border-color 0.2s;
 }
 
+.patient-login-btn {
+  font: inherit;
+  font-size: 16px;
+  padding: 10px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
 .therapist-login-btn:hover {
   border-color: var(--accent-border);
 }
