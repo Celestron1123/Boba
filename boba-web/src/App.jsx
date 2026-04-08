@@ -9,6 +9,7 @@ import Index from './pages/Index'
 import Patients from './pages/Patients'
 import PatientShow from './pages/PatientShow'
 import PatientDashboard from './pages/PatientDashboard'
+import Register from './pages/Register'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/patients"
             element={

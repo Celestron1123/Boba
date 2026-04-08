@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { authenticateUser } from '../data/users'
 import './Index.css'
@@ -62,10 +62,18 @@ export default function Index() {
       <button type="button" className="patient-login-btn" onClick={handlePatientClick}>
         Patient
       </button>
+      <Link className="register-link" to="/register">
+        Register a new user
+      </Link>
       {loginError ? <p className="index-error-message">{loginError}</p> : null}
 
       {isPatientDialogOpen ? (
-        <div className="patient-login-modal" role="dialog" aria-modal="true" aria-labelledby="patient-login-title">
+        <div
+          className="patient-login-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="patient-login-title"
+        >
           <div className="patient-login-card">
             <h2 id="patient-login-title" className="patient-login-title">
               Patient Login
