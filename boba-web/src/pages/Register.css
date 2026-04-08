@@ -1,0 +1,88 @@
+.register-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px 48px;
+  box-sizing: border-box;
+}
+
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: var(--bg);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.register-back-link {
+  display: inline-block;
+  margin-bottom: 18px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.register-back-link:hover {
+  text-decoration: underline;
+}
+
+.register-title {
+  margin: 0 0 12px;
+}
+
+.register-copy {
+  margin-bottom: 20px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.register-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-h);
+}
+
+.register-field input,
+.register-field select {
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.register-message {
+  margin: 0;
+}
+
+.register-message-error {
+  color: #c2410c;
+}
+
+.register-message-success {
+  color: #1c7c50;
+}
+
+.register-submit-btn {
+  font: inherit;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--accent);
+  color: white;
+  cursor: pointer;
+}
+
+.register-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}

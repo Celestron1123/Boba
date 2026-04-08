@@ -24,7 +24,7 @@ It is the CSS for the patients page of the application
   margin: 0;
   padding: 0;
   width: 100%;
-  max-width: 480px;
+  max-width: 700px;
   border: 1px solid var(--border);
   border-radius: 8px;
   overflow: hidden;
@@ -34,11 +34,7 @@ It is the CSS for the patients page of the application
 
 .patient-item {
   padding: 14px 18px;
-  color: var(--text-h);
   border-bottom: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .patient-item:last-child {
@@ -46,12 +42,11 @@ It is the CSS for the patients page of the application
 }
 
 .patient-field {
+  padding: 14px 18px;
   display: grid;
-  grid-template-columns: 5.5rem 1fr;
-  gap: 8px 12px;
-  align-items: baseline;
-  font-size: 16px;
-  line-height: 1.35;
+  grid-template-columns: 2fr 2fr 1fr;
+  gap: 16px;
+  align-items: center;
 }
 
 .patient-label {
@@ -65,11 +60,16 @@ It is the CSS for the patients page of the application
 }
 
 .patient-name-link {
-  color: var(--accent);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  display: block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  line-height: 1.5;
 }
 
 .patient-name-link:hover {
-  text-decoration-thickness: 2px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
 }
