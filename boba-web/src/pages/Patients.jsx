@@ -7,7 +7,7 @@ export default function Patients() {
   const [patients, setPatients] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-
+  const [query, setQuery] = useState("");
   useEffect(() => {
     async function loadPatients() {
       try {
@@ -24,33 +24,25 @@ export default function Patients() {
     loadPatients()
   }, [])
 
+  const filteredPatients = patients.filter(patient => patient.name.toLowerCase().includes(query.toLowerCase()));
+
   if (loading) return <p>Loading patients...</p>
   if (error) return <p>{error}</p>
 
   return (
     <main className="patients-page">
       <h1 className="patients-title">Patients</h1>
+      <input type="text" placeholder="Search Patients" value={query} onChange={(e) => setQuery(e.target.value)} />
 
       <ul className="patient-list">
-        {patients.map((patient) => (
+        {filteredPatients.map((patient) => (
           <li key={patient.id} className="patient-item">
             <div className="patient-field">
-              <span className="patient-label">Name</span>
               <span className="patient-value">
                 <Link className="patient-name-link" to={`/patients/${patient.id}`}>
                   {patient.name}
                 </Link>
               </span>
-            </div>
-
-            <div className="patient-field">
-              <span className="patient-label">Email</span>
-              <span className="patient-value">{patient.email}</span>
-            </div>
-
-            <div className="patient-field">
-              <span className="patient-label">Birthday</span>
-              <span className="patient-value">{patient.birthday}</span>
             </div>
           </li>
         ))}
