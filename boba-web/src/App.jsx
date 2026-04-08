@@ -9,6 +9,7 @@ import Index from './pages/Index'
 import Patients from './pages/Patients'
 import PatientShow from './pages/PatientShow'
 import PatientDashboard from './pages/PatientDashboard'
+import PatientProfile from './pages/PatientProfile'
 import Register from './pages/Register'
 
 export default function App() {
@@ -39,6 +40,14 @@ export default function App() {
             element={
               <PatientRoute>
                 <PatientDashboard />
+              </PatientRoute>
+            }
+          />
+          <Route
+            path="/patient/profile"
+            element={
+              <PatientRoute>
+                <PatientProfile />
               </PatientRoute>
             }
           />

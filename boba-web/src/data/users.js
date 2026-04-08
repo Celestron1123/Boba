@@ -71,3 +71,55 @@ export async function registerUser({ username, password }) {
     username: normalizedUsername,
   }
 }
+
+export async function getUserProfile(username) {
+  const normalizedUsername = username.trim()
+
+  if (!normalizedUsername) {
+    throw new Error('Username is required.')
+  }
+
+  const userRef = doc(db, 'users', normalizedUsername)
+  const snapshot = await getDoc(userRef)
+
+  if (!snapshot.exists()) {
+    throw new Error('User not found.')
+  }
+
+  const data = snapshot.data()
+
+  return {
+    username: normalizedUsername,
+    password: data.password ?? '',
+    email: data.email ?? '',
+    name: data.name ?? '',
+    birthday: data.birthday ?? '',
+  }
+}
+
+export async function updateUserProfile({ username, password, email, name, birthday }) {
+  const normalizedUsername = username.trim()
+
+  if (!normalizedUsername) {
+    throw new Error('Username is required.')
+  }
+
+  const userRef = doc(db, 'users', normalizedUsername)
+  const existingUser = await getDoc(userRef)
+
+  if (!existingUser.exists()) {
+    throw new Error('User not found.')
+  }
+
+  const payload = {
+    username: normalizedUsername,
+    password: password.trim(),
+    email: email.trim(),
+    name: name.trim(),
+    birthday: birthday.trim(),
+  }
+
+  await setDoc(userRef, payload, { merge: true })
+
+  return payload
+}

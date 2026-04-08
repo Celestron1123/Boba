@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { getCurrentPatient } from '../data/patients'
 import { getMoodOption, getPatientLogs, getTodayLog } from '../data/patientLogs'
+import { getUserProfile } from '../data/users'
 import CheckInForm from '../components/CheckInForm'
 import './PatientDashboard.css'
 
@@ -39,14 +40,18 @@ export default function PatientDashboard() {
 
     async function loadPatient() {
       try {
-        const [patientData, patientLogs, existingTodayLog] = await Promise.all([
+        const [patientData, patientLogs, existingTodayLog, userProfile] = await Promise.all([
           getCurrentPatient(currentPatientUsername),
           getPatientLogs(currentPatientUsername),
           getTodayLog(currentPatientUsername, today),
+          getUserProfile(currentPatientUsername),
         ])
 
         if (active) {
-          setPatient(patientData)
+          setPatient({
+            ...patientData,
+            name: userProfile.name || patientData.name,
+          })
           setLogs(patientLogs)
           setTodayLog(existingTodayLog)
         }
@@ -69,9 +74,13 @@ export default function PatientDashboard() {
     }
   }, [currentPatientUsername, today])
 
-  function handleSwitchUser() {
+  function handleLogout() {
     logout()
     navigate('/')
+  }
+
+  function handleProfileClick() {
+    navigate('/patient/profile')
   }
 
   function handleLogSaved(savedLog) {
@@ -100,9 +109,14 @@ export default function PatientDashboard() {
           <h1 className="patient-dashboard-title">Welcome back, {patient.name.split(' ')[0]}</h1>
           <p className="patient-summary">{patient.planSummary}</p>
         </div>
-        <button type="button" className="patient-switch-btn" onClick={handleSwitchUser}>
-          Switch user
-        </button>
+        <div className="patient-hero-actions">
+          <button type="button" className="patient-logout-btn" onClick={handleLogout}>
+            Log out
+          </button>
+          <button type="button" className="patient-profile-btn" onClick={handleProfileClick}>
+            Profile
+          </button>
+        </div>
       </section>
 
       <section className="patient-overview-grid">
