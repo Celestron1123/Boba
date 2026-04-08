@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { getCurrentPatient } from '../data/patients'
 import { getMoodOption, getPatientLogs, getTodayLog } from '../data/patientLogs'
+import { getUserProfile } from '../data/users'
 import CheckInForm from '../components/CheckInForm'
 import './PatientDashboard.css'
-
-const CURRENT_PATIENT_ID = 'ethan'
 
 function getLocalDateString() {
   const now = new Date()
@@ -27,7 +26,7 @@ function formatDisplayDate(dateString) {
 
 export default function PatientDashboard() {
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { logout, currentPatientUsername } = useAuth()
   const [patient, setPatient] = useState(null)
   const [logs, setLogs] = useState([])
   const [todayLog, setTodayLog] = useState(null)
@@ -41,14 +40,18 @@ export default function PatientDashboard() {
 
     async function loadPatient() {
       try {
-        const [patientData, patientLogs, existingTodayLog] = await Promise.all([
-          getCurrentPatient(),
-          getPatientLogs(CURRENT_PATIENT_ID),
-          getTodayLog(CURRENT_PATIENT_ID, today),
+        const [patientData, patientLogs, existingTodayLog, userProfile] = await Promise.all([
+          getCurrentPatient(currentPatientUsername),
+          getPatientLogs(currentPatientUsername),
+          getTodayLog(currentPatientUsername, today),
+          getUserProfile(currentPatientUsername),
         ])
 
         if (active) {
-          setPatient(patientData)
+          setPatient({
+            ...patientData,
+            name: userProfile.name || patientData.name,
+          })
           setLogs(patientLogs)
           setTodayLog(existingTodayLog)
         }
@@ -69,11 +72,15 @@ export default function PatientDashboard() {
     return () => {
       active = false
     }
-  }, [today])
+  }, [currentPatientUsername, today])
 
-  function handleSwitchUser() {
+  function handleLogout() {
     logout()
     navigate('/')
+  }
+
+  function handleProfileClick() {
+    navigate('/patient/profile')
   }
 
   function handleLogSaved(savedLog) {
@@ -102,9 +109,14 @@ export default function PatientDashboard() {
           <h1 className="patient-dashboard-title">Welcome back, {patient.name.split(' ')[0]}</h1>
           <p className="patient-summary">{patient.planSummary}</p>
         </div>
-        <button type="button" className="patient-switch-btn" onClick={handleSwitchUser}>
-          Switch user
-        </button>
+        <div className="patient-hero-actions">
+          <button type="button" className="patient-logout-btn" onClick={handleLogout}>
+            Log out
+          </button>
+          <button type="button" className="patient-profile-btn" onClick={handleProfileClick}>
+            Profile
+          </button>
+        </div>
       </section>
 
       <section className="patient-overview-grid">
@@ -142,6 +154,7 @@ export default function PatientDashboard() {
             )}
           </div>
           <CheckInForm
+            patientId={currentPatientUsername}
             date={today}
             existingLog={todayLog}
             onSaved={handleLogSaved}
@@ -234,6 +247,7 @@ export default function PatientDashboard() {
                       </div>
                     </div>
                     <CheckInForm
+                      patientId={currentPatientUsername}
                       date={log.date}
                       existingLog={log}
                       onSaved={handleLogSaved}

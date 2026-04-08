@@ -1,4 +1,4 @@
-.register-page {
+.patient-profile-page {
   flex: 1;
   display: flex;
   align-items: center;
@@ -7,9 +7,9 @@
   box-sizing: border-box;
 }
 
-.register-card {
+.patient-profile-card {
   width: 100%;
-  max-width: 420px;
+  max-width: 460px;
   padding: 28px;
   border: 1px solid var(--border);
   border-radius: 18px;
@@ -18,40 +18,40 @@
   text-align: left;
 }
 
-.register-back-link {
+.patient-profile-back {
   display: inline-block;
   margin-bottom: 18px;
   color: var(--accent);
   text-decoration: none;
 }
 
-.register-back-link:hover {
+.patient-profile-back:hover {
   text-decoration: underline;
 }
 
-.register-title {
+.patient-profile-title {
   margin: 0 0 12px;
 }
 
-.register-copy {
+.patient-profile-copy {
   margin-bottom: 20px;
 }
 
-.register-form {
+.patient-profile-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.register-field {
+.patient-profile-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
   color: var(--text-h);
 }
 
-.register-field input,
-.register-field select {
+.patient-profile-field input,
+.patient-profile-field select {
   font: inherit;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -60,19 +60,24 @@
   color: var(--text-h);
 }
 
-.register-message {
+.patient-profile-field input:disabled,
+.patient-profile-field select:disabled {
+  opacity: 0.75;
+}
+
+.patient-profile-message {
   margin: 0;
 }
 
-.register-message-error {
+.patient-profile-message-error {
   color: #c2410c;
 }
 
-.register-message-success {
+.patient-profile-message-success {
   color: #1c7c50;
 }
 
-.register-submit-btn {
+.patient-profile-submit-btn {
   font: inherit;
   border: none;
   border-radius: 999px;
@@ -82,7 +87,7 @@
   cursor: pointer;
 }
 
-.register-submit-btn:disabled {
+.patient-profile-submit-btn:disabled {
   opacity: 0.6;
   cursor: wait;
 }

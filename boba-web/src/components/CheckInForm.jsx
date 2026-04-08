@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { MOOD_OPTIONS, createPatientLog, getMoodOption, updatePatientLog } from '../data/patientLogs'
 
 export default function CheckInForm({
+  patientId,
   date,
   existingLog,
   onSaved,
@@ -43,12 +44,14 @@ export default function CheckInForm({
       const emojiOption = getMoodOption(emojiValue)
       const savedLog = existingLog
         ? await updatePatientLog({
+            patientId,
             logId: existingLog.id,
             date,
             mood: emojiOption.value,
             notes: trimmedNotes,
           })
         : await createPatientLog({
+            patientId,
             date,
             mood: emojiOption.value,
             notes: trimmedNotes,

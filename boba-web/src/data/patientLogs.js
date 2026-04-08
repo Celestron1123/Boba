@@ -10,7 +10,7 @@ import {
 } from 'firebase/firestore'
 import { db } from '../firebase'
 
-const CURRENT_PATIENT_ID = 'ethan'
+const CURRENT_USER_ID = 'ethan'
 
 const MOCK_LOGS = [
   {
@@ -37,8 +37,8 @@ export const MOOD_OPTIONS = [
   { value: 'TERRIBLE', emoji: '😣', label: 'Terrible' },
 ]
 
-function logsCollection(patientId = CURRENT_PATIENT_ID) {
-  return collection(db, 'patients', patientId, 'logs')
+function logsCollection(userId = CURRENT_USER_ID) {
+  return collection(db, 'users', userId, 'logs')
 }
 
 function createTimestampLogId() {
@@ -68,9 +68,9 @@ function toLogRecord(snapshot) {
   }
 }
 
-export async function getPatientLogs(patientId = CURRENT_PATIENT_ID) {
+export async function getPatientLogs(userId = CURRENT_USER_ID) {
   try {
-    const logsQuery = query(logsCollection(patientId), orderBy('date', 'desc'))
+    const logsQuery = query(logsCollection(userId), orderBy('date', 'desc'))
     const snapshot = await getDocs(logsQuery)
 
     return snapshot.docs.map(toLogRecord)
@@ -80,9 +80,9 @@ export async function getPatientLogs(patientId = CURRENT_PATIENT_ID) {
   }
 }
 
-export async function getTodayLog(patientId = CURRENT_PATIENT_ID, date) {
+export async function getTodayLog(userId = CURRENT_USER_ID, date) {
   try {
-    const logsQuery = query(logsCollection(patientId), where('date', '==', date))
+    const logsQuery = query(logsCollection(userId), where('date', '==', date))
     const snapshot = await getDocs(logsQuery)
     const log = snapshot.docs[0]
 
@@ -93,7 +93,7 @@ export async function getTodayLog(patientId = CURRENT_PATIENT_ID, date) {
   }
 }
 
-export async function createPatientLog({ patientId = CURRENT_PATIENT_ID, date, mood, notes }) {
+export async function createPatientLog({ patientId = CURRENT_USER_ID, date, mood, notes }) {
   const logId = createTimestampLogId()
   const payload = {
     date,
@@ -128,7 +128,7 @@ export async function createPatientLog({ patientId = CURRENT_PATIENT_ID, date, m
 }
 
 export async function updatePatientLog({
-  patientId = CURRENT_PATIENT_ID,
+  patientId = CURRENT_USER_ID,
   logId,
   date,
   mood,

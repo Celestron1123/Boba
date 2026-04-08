@@ -2,10 +2,10 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 
 export default function PatientRoute({ children }) {
-  const { isLoggedInAsPatient } = useAuth()
+  const { isLoggedInAsPatient, currentPatientUsername } = useAuth()
   const location = useLocation()
 
-  if (!isLoggedInAsPatient) {
+  if (!isLoggedInAsPatient || !currentPatientUsername) {
     return <Navigate to="/" replace state={{ from: location }} />
   }
 
