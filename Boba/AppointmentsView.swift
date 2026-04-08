@@ -5,8 +5,11 @@ import FirebaseAuth
 struct AppointmentsView: View {
     let days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
     let dates = Array(1...12)
+    // this is a test account that is already in the database
+    let testUserID = "DIcDBezlyUSKuHO7WdsGizkEuzl1"
     @State private var selectedDate = 3
     @State private var selectedTime = "10:00 AM"
+    @State private var showConfirmation = false
     
     var body: some View {
         ZStack {
@@ -44,6 +47,11 @@ struct AppointmentsView: View {
                     .padding(.top, 24)
                 }
             }
+        }.alert("Appointment Confirmed", isPresented: $showConfirmation) {
+            Button("Done", role: .cancel) {
+            }
+        } message: {
+            Text("You are all set for \(selectedTime) on October \(selectedDate). Dr. Smith looks forward to seeing you!")
         }
     }
     
@@ -88,8 +96,8 @@ struct AppointmentsView: View {
     }
     
     //var upcomingAppointments: some View {
-        /// TO: DO
-        /// Appointment information will be pulled from database
+    /// TO: DO
+    /// Appointment information will be pulled from database
     //}
     
     var calendarSection: some View {
@@ -217,28 +225,33 @@ struct AppointmentsView: View {
         .padding(.top, 8)
     }
     
-    func scheduleAppointment(){
-        guard let uid = Auth.auth().currentUser?.uid else { return }
+    func scheduleAppointment() {
+        let uid = testUserID
+            
+        let newAppointment = Appointment(
+            Date: Date(),
+            Patient: uid,
+            Provider: "Dr. Smith",
+            Time: selectedTime,
+        )
+        
         let db = Firestore.firestore()
-        let data: [String: Any] = [
-                    "patientId": uid,
-                    "date": selectedDate,
-                    "time": selectedTime,
-                    "practitioner": "Dr. Smith",
-                    "status": "pending"
-                ]
-        
-        db.collection("appointments").addDocument(data: data){ error in
-            if let error = error{
-                print("Error: \(error.localizedDescription)")
+        do {
+            try db.collection("appointments").addDocument(from: newAppointment) { error in
+                if let error = error {
+                    print("Firestore Error: \(error.localizedDescription)")
+                } else {
+                    print("Success! Appointment for \(selectedTime) added to database.")
+                    DispatchQueue.main.async {
+                        self.showConfirmation = true
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                    }
+                }
             }
-            else {
-                print("Appt booked for \(selectedTime)!")
-            }
+        } catch {
+            print("Encoding Error: \(error.localizedDescription)")
         }
-        
     }
-}
-
     
-
+}
