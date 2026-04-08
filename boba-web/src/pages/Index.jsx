@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import './Index.css'
 
@@ -28,6 +28,9 @@ export default function Index() {
       <button type="button" className="patient-login-btn" onClick={handlePatientClick}>
         Patient
       </button>
+      <Link className="register-link" to="/register">
+        Register a new user
+      </Link>
     </main>
   )
 }
