@@ -50,7 +50,8 @@
   color: var(--text-h);
 }
 
-.patient-profile-field input {
+.patient-profile-field input,
+.patient-profile-field select {
   font: inherit;
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -59,7 +60,8 @@
   color: var(--text-h);
 }
 
-.patient-profile-field input:disabled {
+.patient-profile-field input:disabled,
+.patient-profile-field select:disabled {
   opacity: 0.75;
 }
 

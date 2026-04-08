@@ -50,7 +50,8 @@
   color: var(--text-h);
 }
 
-.register-field input {
+.register-field input,
+.register-field select {
   font: inherit;
   border: 1px solid var(--border);
   border-radius: 12px;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
-import { getUserProfile, updateUserProfile } from '../data/users'
+import { getUserProfile, updateUserProfile, USER_ROLE_OPTIONS } from '../data/users'
 import './PatientProfile.css'
 
 export default function PatientProfile() {
@@ -12,6 +12,7 @@ export default function PatientProfile() {
     email: '',
     name: '',
     birthday: '',
+    role: 'PATIENT',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -72,6 +73,9 @@ export default function PatientProfile() {
     }
   }
 
+  const roleLabel =
+    USER_ROLE_OPTIONS.find((option) => option.value === profile.role)?.label ?? profile.role
+
   if (loading) {
     return <main className="patient-profile-page">Loading profile...</main>
   }
@@ -119,6 +123,11 @@ export default function PatientProfile() {
           <label className="patient-profile-field">
             <span>Birthday</span>
             <input type="text" name="birthday" value={profile.birthday} onChange={handleChange} />
+          </label>
+
+          <label className="patient-profile-field">
+            <span>User type</span>
+            <input type="text" value={roleLabel} disabled readOnly />
           </label>
 
           {error ? <p className="patient-profile-message patient-profile-message-error">{error}</p> : null}

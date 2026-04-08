@@ -1,6 +1,11 @@
 import { collection, doc, getDoc, getDocs, query, setDoc, where } from 'firebase/firestore'
 import { db } from '../firebase'
 
+export const USER_ROLE_OPTIONS = [
+  { value: 'PATIENT', label: 'Patient' },
+  { value: 'THERAPIST', label: 'Therapist' },
+]
+
 async function getUserByUsername(username) {
   const normalizedUsername = username.trim()
 
@@ -47,9 +52,10 @@ export async function authenticateUser({ username, password }) {
   }
 }
 
-export async function registerUser({ username, password }) {
+export async function registerUser({ username, password, role = 'PATIENT' }) {
   const normalizedUsername = username.trim()
   const normalizedPassword = password.trim()
+  const normalizedRole = role.trim() || 'PATIENT'
 
   if (!normalizedUsername || !normalizedPassword) {
     throw new Error('Username and password are required.')
@@ -65,10 +71,12 @@ export async function registerUser({ username, password }) {
   await setDoc(userRef, {
     username: normalizedUsername,
     password: normalizedPassword,
+    role: normalizedRole,
   })
 
   return {
     username: normalizedUsername,
+    role: normalizedRole,
   }
 }
 
@@ -94,10 +102,11 @@ export async function getUserProfile(username) {
     email: data.email ?? '',
     name: data.name ?? '',
     birthday: data.birthday ?? '',
+    role: data.role ?? 'PATIENT',
   }
 }
 
-export async function updateUserProfile({ username, password, email, name, birthday }) {
+export async function updateUserProfile({ username, password, email, name, birthday, role }) {
   const normalizedUsername = username.trim()
 
   if (!normalizedUsername) {
@@ -117,6 +126,7 @@ export async function updateUserProfile({ username, password, email, name, birth
     email: email.trim(),
     name: name.trim(),
     birthday: birthday.trim(),
+    role: role?.trim() || 'PATIENT',
   }
 
   await setDoc(userRef, payload, { merge: true })
