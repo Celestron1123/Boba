@@ -145,6 +145,11 @@ export async function getPatientById(id) {
   }
 }
 
-export async function getCurrentPatient() {
-  return MOCK_PATIENT_VIEW
+export async function getCurrentPatient(username = 'ethan') {
+  return {
+    ...MOCK_PATIENT_VIEW,
+    id: username,
+    email: `${username}@example.com`,
+    name: username === 'ethan' ? MOCK_PATIENT_VIEW.name : `${username} Patient`,
+  }
 }

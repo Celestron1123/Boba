@@ -12,6 +12,7 @@ It includes flex box direction as well to center the content
   padding: 32px 20px 48px;
   text-align: center;
   gap: 8px;
+  position: relative;
 }
 
 .index-title {
@@ -46,7 +47,101 @@ It includes flex box direction as well to center the content
   border-color: var(--accent-border);
 }
 
+.patient-login-btn:hover {
+  border-color: var(--accent-border);
+}
+
 .therapist-login-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+.patient-login-btn:focus-visible,
+.patient-login-submit-btn:focus-visible,
+.patient-login-cancel-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.index-error-message {
+  margin-top: 10px;
+  color: #c2410c;
+}
+
+.patient-login-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 6, 13, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 10;
+}
+
+.patient-login-card {
+  width: min(100%, 420px);
+  padding: 24px;
+  border-radius: 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-align: left;
+}
+
+.patient-login-title {
+  margin: 0 0 16px;
+}
+
+.patient-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.patient-login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-h);
+}
+
+.patient-login-field input {
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.patient-login-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.patient-login-submit-btn,
+.patient-login-cancel-btn {
+  font: inherit;
+  border-radius: 999px;
+  padding: 12px 18px;
+  cursor: pointer;
+}
+
+.patient-login-submit-btn {
+  border: none;
+  background: var(--accent);
+  color: white;
+}
+
+.patient-login-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.patient-login-cancel-btn {
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--accent);
 }

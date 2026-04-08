@@ -6,8 +6,6 @@ import { getMoodOption, getPatientLogs, getTodayLog } from '../data/patientLogs'
 import CheckInForm from '../components/CheckInForm'
 import './PatientDashboard.css'
 
-const CURRENT_PATIENT_ID = 'ethan'
-
 function getLocalDateString() {
   const now = new Date()
   const year = now.getFullYear()
@@ -27,7 +25,7 @@ function formatDisplayDate(dateString) {
 
 export default function PatientDashboard() {
   const navigate = useNavigate()
-  const { logout } = useAuth()
+  const { logout, currentPatientUsername } = useAuth()
   const [patient, setPatient] = useState(null)
   const [logs, setLogs] = useState([])
   const [todayLog, setTodayLog] = useState(null)
@@ -42,9 +40,9 @@ export default function PatientDashboard() {
     async function loadPatient() {
       try {
         const [patientData, patientLogs, existingTodayLog] = await Promise.all([
-          getCurrentPatient(),
-          getPatientLogs(CURRENT_PATIENT_ID),
-          getTodayLog(CURRENT_PATIENT_ID, today),
+          getCurrentPatient(currentPatientUsername),
+          getPatientLogs(currentPatientUsername),
+          getTodayLog(currentPatientUsername, today),
         ])
 
         if (active) {
@@ -69,7 +67,7 @@ export default function PatientDashboard() {
     return () => {
       active = false
     }
-  }, [today])
+  }, [currentPatientUsername, today])
 
   function handleSwitchUser() {
     logout()
@@ -142,6 +140,7 @@ export default function PatientDashboard() {
             )}
           </div>
           <CheckInForm
+            patientId={currentPatientUsername}
             date={today}
             existingLog={todayLog}
             onSaved={handleLogSaved}
@@ -234,6 +233,7 @@ export default function PatientDashboard() {
                       </div>
                     </div>
                     <CheckInForm
+                      patientId={currentPatientUsername}
                       date={log.date}
                       existingLog={log}
                       onSaved={handleLogSaved}

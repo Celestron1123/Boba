@@ -7,26 +7,31 @@ import { AuthContext } from './auth-context'
 export function AuthProvider({ children }) {
   const [isLoggedInAsTherapist, setIsLoggedInAsTherapist] = useState(false)
   const [isLoggedInAsPatient, setIsLoggedInAsPatient] = useState(false)
+  const [currentPatientUsername, setCurrentPatientUsername] = useState('')
 
   const loginAsTherapist = useCallback(() => {
     setIsLoggedInAsTherapist(true)
     setIsLoggedInAsPatient(false)
+    setCurrentPatientUsername('')
   }, [])
 
-  const loginAsPatient = useCallback(() => {
+  const loginAsPatient = useCallback((username) => {
     setIsLoggedInAsTherapist(false)
     setIsLoggedInAsPatient(true)
+    setCurrentPatientUsername(username)
   }, [])
 
   const logout = useCallback(() => {
     setIsLoggedInAsTherapist(false)
     setIsLoggedInAsPatient(false)
+    setCurrentPatientUsername('')
   }, [])
 
   const value = useMemo(
     () => ({
       isLoggedInAsTherapist,
       isLoggedInAsPatient,
+      currentPatientUsername,
       loginAsTherapist,
       loginAsPatient,
       logout,
@@ -34,6 +39,7 @@ export function AuthProvider({ children }) {
     [
       isLoggedInAsTherapist,
       isLoggedInAsPatient,
+      currentPatientUsername,
       loginAsTherapist,
       loginAsPatient,
       logout,
