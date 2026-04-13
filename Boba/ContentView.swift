@@ -24,12 +24,14 @@ struct ContentView: View {
                 switch selectedIndex {
                 // Home dashboard
                 case 0: HomeDashboardView()
+                // Past logs
+                case 1: DailyLogListView()
                 // Appointments
-                case 1: AppointmentsView()
+                case 2: AppointmentsView()
                 // Secure chat
-                case 2: SecureChatView()
+                case 3: SecureChatView()
                 // Patient profile
-                case 3: PatientProfileView()
+                case 4: PatientProfileView()
                 // Fallback to home
                 default: HomeDashboardView()
                 }

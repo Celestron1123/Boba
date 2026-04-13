@@ -54,7 +54,7 @@ struct BottomNavBar: View {
     var body: some View {
         HStack {
             // Iterate icons and apply selected state styling
-            ForEach(0..<4) { index in
+            ForEach(0..<5) { index in
                 Spacer()
                 Button(action: {
                     withAnimation(.spring()) {
@@ -91,9 +91,10 @@ struct BottomNavBar: View {
     func iconName(for index: Int) -> String {
         switch index {
         case 0: return "house.fill"
-        case 1: return "calendar"
-        case 2: return "message.fill"
-        case 3: return "person.fill"
+        case 1: return "list.bullet"
+        case 2: return "calendar"
+        case 3: return "message.fill"
+        case 4: return "person.fill"
         default: return "house.fill"
         }
     }
