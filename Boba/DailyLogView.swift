@@ -323,25 +323,21 @@ extension DailyLogView {
         let newLog = DailyLog(
             date: Date(),
             mood: selectedMood,
-            //tags: Array(selectedTags), // Convert Set back to Array for Firebase
+            //tags: Array(selectedTags),
             //hydration: hydrationLevel,
             //sleep: sleepHours,
             notes: journalText
         )
         
-        // 2. Reference your Firestore database
         let db = Firestore.firestore()
         
-        // 3. Push to a collection named "daily_logs"
         do {
             try db.collection("logs").addDocument(from: newLog) { error in
                 isSubmitting = false
                 if let error = error {
                     print("Error saving log: \(error.localizedDescription)")
-                    // Handle error (e.g., show an alert)
                 } else {
                     print("Successfully saved daily log!")
-                    // Handle success (e.g., clear the form or dismiss the view)
                 }
             }
         } catch {
