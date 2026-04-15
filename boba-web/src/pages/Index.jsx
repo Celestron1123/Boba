@@ -10,43 +10,56 @@ import './Index.css'
 export default function Index() {
   const navigate = useNavigate()
   const { loginAsTherapist, loginAsPatient } = useAuth()
-  const [isPatientDialogOpen, setIsPatientDialogOpen] = useState(false)
+  const [loginDialogRole, setLoginDialogRole] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
   const [isAuthenticating, setIsAuthenticating] = useState(false)
 
   function handleTherapistClick() {
-    loginAsTherapist()
-    navigate('/patients')
+    openLoginDialog('THERAPIST')
   }
 
   function handlePatientClick() {
+    openLoginDialog('PATIENT')
+  }
+
+  function openLoginDialog(role) {
     setLoginError('')
     setUsername('')
     setPassword('')
-    setIsPatientDialogOpen(true)
+    setLoginDialogRole(role)
   }
 
-  function closePatientDialog() {
-    setIsPatientDialogOpen(false)
+  function closeLoginDialog() {
+    setLoginDialogRole('')
     setUsername('')
     setPassword('')
   }
 
-  async function handlePatientLogin(event) {
+  async function handleLogin(event) {
     event.preventDefault()
     setIsAuthenticating(true)
     setLoginError('')
 
     try {
       const user = await authenticateUser({ username, password })
-      loginAsPatient(user.username)
-      closePatientDialog()
-      navigate('/patient')
+      if (user.role !== loginDialogRole) {
+        throw new Error('Login failed. Incorrect username or password.')
+      }
+
+      if (loginDialogRole === 'THERAPIST') {
+        loginAsTherapist()
+        closeLoginDialog()
+        navigate('/patients')
+      } else {
+        loginAsPatient(user.username)
+        closeLoginDialog()
+        navigate('/patient')
+      }
     } catch (error) {
       console.error(error)
-      closePatientDialog()
+      closeLoginDialog()
       setLoginError('Login failed. Incorrect username or password.')
     } finally {
       setIsAuthenticating(false)
@@ -67,18 +80,18 @@ export default function Index() {
       </Link>
       {loginError ? <p className="index-error-message">{loginError}</p> : null}
 
-      {isPatientDialogOpen ? (
+      {loginDialogRole ? (
         <div
           className="patient-login-modal"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="patient-login-title"
+          aria-labelledby="user-login-title"
         >
           <div className="patient-login-card">
-            <h2 id="patient-login-title" className="patient-login-title">
-              Patient Login
+            <h2 id="user-login-title" className="patient-login-title">
+              {loginDialogRole === 'THERAPIST' ? 'Therapist Login' : 'Patient Login'}
             </h2>
-            <form className="patient-login-form" onSubmit={handlePatientLogin}>
+            <form className="patient-login-form" onSubmit={handleLogin}>
               <label className="patient-login-field">
                 <span>Username</span>
                 <input
@@ -101,7 +114,7 @@ export default function Index() {
                 <button type="submit" className="patient-login-submit-btn" disabled={isAuthenticating}>
                   {isAuthenticating ? 'Signing in...' : 'Log in'}
                 </button>
-                <button type="button" className="patient-login-cancel-btn" onClick={closePatientDialog}>
+                <button type="button" className="patient-login-cancel-btn" onClick={closeLoginDialog}>
                   Cancel
                 </button>
               </div>

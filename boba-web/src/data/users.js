@@ -49,6 +49,7 @@ export async function authenticateUser({ username, password }) {
 
   return {
     username: user.username ?? normalizedUsername,
+    role: user.role ?? 'PATIENT',
   }
 }
 
