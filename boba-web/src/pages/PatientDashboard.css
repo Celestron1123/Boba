@@ -2,7 +2,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--space-xl);
   padding: 32px 20px 48px;
   box-sizing: border-box;
 }
@@ -13,12 +13,15 @@
   gap: 20px;
   align-items: flex-start;
   padding: 28px;
-  border-radius: 20px;
-  background:
-    linear-gradient(135deg, rgba(170, 59, 255, 0.14), rgba(255, 255, 255, 0)),
-    linear-gradient(180deg, var(--bg), rgba(244, 243, 236, 0.7));
-  border: 1px solid var(--border);
   text-align: left;
+}
+
+/* Hero: brand gradient over glass (matches primaryGradient) */
+.patient-hero.ds-glass {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-primary) 18%, transparent), transparent),
+    linear-gradient(180deg, var(--surface), var(--surface-container-low)),
+    color-mix(in srgb, var(--surface) 72%, transparent);
 }
 
 .patient-eyebrow {
@@ -26,12 +29,12 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin-bottom: 8px;
+  color: var(--color-on-primary-container);
+  margin-bottom: var(--space-sm);
 }
 
 .patient-dashboard-title {
-  margin: 0 0 12px;
+  margin: 0 0 var(--space-md);
 }
 
 .patient-summary {
@@ -55,7 +58,7 @@
 .patient-hero-actions {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
   align-items: stretch;
 }
 
@@ -75,16 +78,17 @@
 
 .patient-card,
 .patient-panel {
-  border: 1px solid var(--border);
-  border-radius: 18px;
   padding: 22px;
-  background: var(--bg);
   text-align: left;
-  box-shadow: var(--shadow);
 }
 
-.patient-card-emphasis {
-  background: linear-gradient(180deg, var(--accent-bg), var(--bg));
+.patient-card-emphasis.ds-glass {
+  background: linear-gradient(
+      180deg,
+      var(--accent-bg),
+      color-mix(in srgb, var(--surface) 74%, transparent)
+    ),
+    color-mix(in srgb, var(--surface) 72%, transparent);
 }
 
 .patient-card h2,
@@ -110,21 +114,21 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-md);
 }
 
 .patient-dashboard-list li {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 12px;
+  gap: var(--space-md);
   color: var(--text-h);
 }
 
 .patient-dashboard-list li::before {
   content: '•';
   color: var(--accent);
-  margin-right: 8px;
+  margin-right: var(--space-sm);
 }
 
 .patient-dashboard-list li > span:first-child {
@@ -139,7 +143,7 @@
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-md);
   min-height: 140px;
 }
 
@@ -147,7 +151,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   flex: 1;
 }
 
@@ -155,7 +159,7 @@
   width: 100%;
   max-width: 40px;
   border-radius: 999px 999px 10px 10px;
-  background: linear-gradient(180deg, var(--accent), rgba(170, 59, 255, 0.3));
+  background: var(--gradient-primary);
   min-height: 18px;
 }
 
@@ -167,8 +171,8 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
 }
 
 .patient-panel-heading h2,
@@ -187,7 +191,7 @@
   align-items: center;
   justify-content: center;
   min-width: 72px;
-  padding: 6px 12px;
+  padding: 6px var(--space-md);
   border-radius: 999px;
   background: var(--accent-bg);
   color: var(--accent);
@@ -196,8 +200,8 @@
 }
 
 .patient-checkin-pill-complete {
-  background: rgba(28, 168, 107, 0.14);
-  color: #1c7c50;
+  background: color-mix(in srgb, var(--color-tertiary-container) 45%, transparent);
+  color: var(--color-on-tertiary-container);
 }
 
 .check-in-form {
@@ -209,7 +213,7 @@
 .check-in-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-sm);
 }
 
 .check-in-field label,
@@ -222,9 +226,9 @@
 .check-in-field textarea {
   font: inherit;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 12px 14px;
-  background: var(--bg);
+  background: var(--surface-container-low);
   color: var(--text-h);
 }
 
@@ -242,7 +246,7 @@
 .check-in-mood-options {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
+  gap: var(--space-md);
   margin-top: 10px;
 }
 
@@ -254,7 +258,39 @@
   border-radius: 14px;
   padding: 12px;
   cursor: pointer;
-  background: var(--bg);
+  background: var(--surface-container-low);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+
+.check-in-mood-option:has(input:checked) {
+  border-color: var(--accent);
+}
+
+.check-in-mood-option[data-mood='GREAT']:has(input:checked) {
+  background: var(--mood-great);
+  border-color: color-mix(in srgb, var(--mood-great) 50%, var(--color-on-surface));
+}
+
+.check-in-mood-option[data-mood='GOOD']:has(input:checked) {
+  background: var(--mood-good);
+  border-color: color-mix(in srgb, var(--mood-good) 50%, var(--color-on-surface));
+}
+
+.check-in-mood-option[data-mood='OKAY']:has(input:checked) {
+  background: var(--mood-okay);
+  border-color: color-mix(in srgb, var(--mood-okay) 50%, var(--color-on-surface));
+}
+
+.check-in-mood-option[data-mood='SAD']:has(input:checked) {
+  background: var(--mood-bad);
+  border-color: color-mix(in srgb, var(--mood-bad) 50%, var(--color-on-surface));
+}
+
+.check-in-mood-option[data-mood='TERRIBLE']:has(input:checked) {
+  background: var(--mood-terrible);
+  border-color: color-mix(in srgb, var(--mood-terrible) 50%, var(--color-on-surface));
 }
 
 .check-in-mood-option input {
@@ -267,7 +303,7 @@
 }
 
 .check-in-error {
-  color: #c2410c;
+  color: var(--color-on-error-container);
 }
 
 .check-in-submit-btn {
@@ -276,14 +312,14 @@
   border-radius: 999px;
   padding: 12px 18px;
   background: var(--accent);
-  color: white;
+  color: #fff;
   cursor: pointer;
 }
 
 .check-in-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-md);
   flex-wrap: wrap;
 }
 
@@ -303,23 +339,30 @@
 }
 
 .patient-log-card {
-  border: 1px solid var(--border);
-  border-radius: 16px;
   padding: 18px;
-  background: linear-gradient(180deg, rgba(244, 243, 236, 0.5), var(--bg));
+  background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--surface-container) 55%, transparent),
+      color-mix(in srgb, var(--surface) 72%, transparent)
+    ),
+    color-mix(in srgb, var(--surface) 72%, transparent);
+}
+
+.patient-log-card.ds-glass {
+  border-radius: var(--radius-md);
 }
 
 .patient-log-header {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-md);
   margin-bottom: 10px;
 }
 
 .patient-log-mood {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-sm);
   color: var(--text-h);
   font-weight: 500;
 }

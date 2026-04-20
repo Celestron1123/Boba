@@ -12,6 +12,18 @@ It is the CSS for the patients page of the application
   text-align: center;
 }
 
+.patients-page input[type='text'] {
+  width: min(100%, 700px);
+  margin-bottom: var(--space-lg);
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: var(--surface-container-low);
+  color: var(--text-h);
+  box-sizing: border-box;
+}
+
 .patients-title {
   margin: 0;
   text-align: center;
@@ -56,11 +68,12 @@ It is the CSS for the patients page of the application
   padding: 0;
   width: 100%;
   max-width: 700px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
   overflow: hidden;
-  background: var(--bg);
   text-align: left;
+}
+
+.patient-list.ds-glass {
+  border-radius: var(--radius-md);
 }
 
 .patient-item {
@@ -101,6 +114,6 @@ It is the CSS for the patients page of the application
 }
 
 .patient-name-link:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  background-color: color-mix(in srgb, var(--surface-container-high) 80%, transparent);
+  border-radius: var(--radius-sm);
 }

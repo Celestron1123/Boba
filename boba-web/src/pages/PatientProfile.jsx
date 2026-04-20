@@ -86,7 +86,7 @@ export default function PatientProfile() {
 
   return (
     <main className="patient-profile-page">
-      <div className="patient-profile-card">
+      <div className="patient-profile-card ds-glass">
         <Link className="patient-profile-back" to="/patient">
           ← Back to patient page
         </Link>

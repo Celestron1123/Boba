@@ -34,7 +34,7 @@ export default function Register() {
 
   return (
     <main className="register-page">
-      <div className="register-card">
+      <div className="register-card ds-glass">
         <Link className="register-back-link" to="/">
           ← Home
         </Link>

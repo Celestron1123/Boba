@@ -103,7 +103,7 @@ export default function PatientDashboard() {
 
   return (
     <main className="patient-dashboard-page">
-      <section className="patient-hero">
+      <section className="patient-hero ds-glass">
         <div>
           <p className="patient-eyebrow">Patient view</p>
           <h1 className="patient-dashboard-title">Welcome back, {patient.name.split(' ')[0]}</h1>
@@ -120,19 +120,19 @@ export default function PatientDashboard() {
       </section>
 
       <section className="patient-overview-grid">
-        <article className="patient-card patient-card-emphasis">
+        <article className="patient-card patient-card-emphasis ds-glass">
           <h2>Next appointment</h2>
           <p className="patient-card-value">{patient.nextAppointment}</p>
           <p className="patient-card-meta">with {patient.therapistName}</p>
         </article>
 
-        <article className="patient-card">
+        <article className="patient-card ds-glass">
           <h2>Current focus</h2>
           <p className="patient-card-value">{patient.programStage}</p>
           <p className="patient-card-meta">{patient.checkInStatus}</p>
         </article>
 
-        <article className="patient-card">
+        <article className="patient-card ds-glass">
           <h2>Care team</h2>
           <p className="patient-card-value">{patient.careTeam.therapist}</p>
           <p className="patient-card-meta">{patient.careTeam.therapistEmail}</p>
@@ -141,7 +141,7 @@ export default function PatientDashboard() {
       </section>
 
       <section className="patient-content-grid">
-        <article className="patient-panel patient-panel-wide">
+        <article className="patient-panel patient-panel-wide ds-glass">
           <div className="patient-panel-heading">
             <div>
               <h2>Daily check-in</h2>
@@ -163,7 +163,7 @@ export default function PatientDashboard() {
           />
         </article>
 
-        <article className="patient-panel">
+        <article className="patient-panel ds-glass">
           <h2>This week&apos;s goals</h2>
           <ul className="patient-dashboard-list">
             {patient.goals.map((goal) => (
@@ -172,7 +172,7 @@ export default function PatientDashboard() {
           </ul>
         </article>
 
-        <article className="patient-panel">
+        <article className="patient-panel ds-glass">
           <h2>To do</h2>
           <ul className="patient-dashboard-list">
             {patient.tasks.map((task) => (
@@ -184,7 +184,7 @@ export default function PatientDashboard() {
           </ul>
         </article>
 
-        <article className="patient-panel">
+        <article className="patient-panel ds-glass">
           <h2>Mood trend</h2>
           <div className="patient-mood-trend" aria-label="Mood trend for the week">
             {patient.moodTrend.map((entry) => (
@@ -200,7 +200,7 @@ export default function PatientDashboard() {
           </div>
         </article>
 
-        <article className="patient-panel">
+        <article className="patient-panel ds-glass">
           <h2>Recent progress</h2>
           <ul className="patient-dashboard-list">
             {patient.recentWins.map((win) => (
@@ -209,7 +209,7 @@ export default function PatientDashboard() {
           </ul>
         </article>
 
-        <article className="patient-panel patient-panel-wide">
+        <article className="patient-panel patient-panel-wide ds-glass">
           <div className="patient-panel-heading">
             <div>
               <h2>Previous check-ins</h2>
@@ -233,7 +233,7 @@ export default function PatientDashboard() {
                 const option = getMoodOption(log.mood)
 
                 return (
-                  <article key={log.id} className="patient-log-card">
+                  <article key={log.id} className="patient-log-card ds-glass">
                     <div className="patient-log-header">
                       <div>
                         <h3>{formatDisplayDate(log.date)}</h3>
@@ -261,7 +261,7 @@ export default function PatientDashboard() {
           )}
         </article>
 
-        <article className="patient-panel patient-panel-wide">
+        <article className="patient-panel patient-panel-wide ds-glass">
           <h2>Notes from your therapist</h2>
           <ul className="patient-dashboard-list">
             {patient.notesFromTherapist.map((note) => (

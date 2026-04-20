@@ -1,27 +1,85 @@
 /*
-I beleive Vite created this file automatically when I created the project.
+  Design tokens aligned with DesignSystem.swift — warm surfaces, primary brown accent,
+  glass-style cards, and headline typography (rounded where supported).
 */
 
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  /* Surface scale */
+  --surface: #fdf9f4;
+  --surface-container-low: #f7f3ee;
+  --surface-container: #f1ede8;
+  --surface-container-high: #ebe8e3;
+  --surface-container-highest: #e6e2dd;
+
+  /* Primary */
+  --color-primary: #765928;
+  --color-primary-container: #e1bb80;
+  --color-on-primary-container: #654a1a;
+
+  /* Content */
+  --color-on-surface: #1c1c19;
+  --color-on-surface-variant: #4e453a;
+
+  /* Secondary / tertiary (accents) */
+  --color-secondary: #765278;
+  --color-secondary-container: #ffd1fe;
+  --color-on-secondary-container: #7b567c;
+  --color-tertiary: #006c53;
+  --color-tertiary-container: #65d4af;
+  --color-on-tertiary-container: #005a44;
+
+  /* Error / success messaging */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+
+  --color-outline-variant: #d1c5b5;
+
+  /* Mood (check-ins) */
+  --mood-terrible: #ffcac8;
+  --mood-bad: #fbcfb5;
+  --mood-okay: #efd5ad;
+  --mood-good: #e2dbad;
+  --mood-great: #d2e0b4;
+
+  /* Aliases for existing pages */
+  --text: var(--color-on-surface-variant);
+  --text-h: var(--color-on-surface);
+  --bg: var(--surface);
+  --border: var(--color-outline-variant);
+  --code-bg: var(--surface-container);
+  --accent: var(--color-primary);
+  --accent-bg: color-mix(in srgb, var(--color-primary) 14%, transparent);
+  --accent-border: color-mix(in srgb, var(--color-primary) 45%, transparent);
+  --social-bg: color-mix(in srgb, var(--surface-container-low) 70%, transparent);
+
+  /* Primary brand gradient (top-leading → bottom-trailing) */
+  --gradient-primary: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-container) 100%
+  );
+
+  /* Elevation: themeOnSurface @ 6%, radius 32, y 12 */
+  --shadow: rgba(28, 28, 25, 0.06) 0 12px 32px 0;
+
+  /* Radii / spacing (DS) */
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: ui-rounded, 'SF Pro Rounded', 'Segoe UI', system-ui, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
-  color-scheme: light dark;
+  color-scheme: light;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -31,26 +89,6 @@ I beleive Vite created this file automatically when I created the project.
 
   @media (max-width: 1024px) {
     font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
   }
 }
 
@@ -73,7 +111,7 @@ body {
 h1,
 h2 {
   font-family: var(--heading);
-  font-weight: 500;
+  font-weight: 700;
   color: var(--text-h);
 }
 
@@ -86,15 +124,17 @@ h1 {
     margin: 20px 0;
   }
 }
+
 h2 {
   font-size: 24px;
   line-height: 118%;
   letter-spacing: -0.24px;
-  margin: 0 0 8px;
+  margin: 0 0 var(--space-sm);
   @media (max-width: 1024px) {
     font-size: 20px;
   }
 }
+
 p {
   margin: 0;
 }
@@ -103,13 +143,25 @@ code,
 .counter {
   font-family: var(--mono);
   display: inline-flex;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   color: var(--text-h);
 }
 
 code {
   font-size: 15px;
   line-height: 135%;
-  padding: 4px 8px;
+  padding: var(--space-xs) var(--space-sm);
   background: var(--code-bg);
+}
+
+/* Glass-style surface (Liquid Glass–inspired: blur + tint + soft stroke) */
+.ds-glass {
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(1.12);
+  -webkit-backdrop-filter: blur(20px) saturate(1.12);
+  border: 1px solid color-mix(in srgb, white 55%, var(--border));
+  box-shadow:
+    var(--shadow),
+    inset 0 0 0 1px color-mix(in srgb, white 20%, transparent);
+  border-radius: var(--radius-lg);
 }
