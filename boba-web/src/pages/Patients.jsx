@@ -48,7 +48,7 @@ export default function Patients() {
       </div>
       <input type="text" placeholder="Search Patients" value={query} onChange={(e) => setQuery(e.target.value)} />
 
-      <ul className="patient-list">
+      <ul className="patient-list ds-glass">
         {filteredPatients.map((patient) => (
           <li key={patient.id} className="patient-item">
             <div className="patient-field">

@@ -11,10 +11,6 @@
   width: 100%;
   max-width: 460px;
   padding: 28px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: var(--bg);
-  box-shadow: var(--shadow);
   text-align: left;
 }
 
@@ -54,9 +50,9 @@
 .patient-profile-field select {
   font: inherit;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 12px 14px;
-  background: var(--bg);
+  background: var(--surface-container-low);
   color: var(--text-h);
 }
 
@@ -70,11 +66,11 @@
 }
 
 .patient-profile-message-error {
-  color: #c2410c;
+  color: var(--color-on-error-container);
 }
 
 .patient-profile-message-success {
-  color: #1c7c50;
+  color: var(--color-on-tertiary-container);
 }
 
 .patient-profile-submit-btn {
@@ -83,7 +79,7 @@
   border-radius: 999px;
   padding: 12px 18px;
   background: var(--accent);
-  color: white;
+  color: #fff;
   cursor: pointer;
 }
 

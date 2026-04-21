@@ -87,7 +87,7 @@ export default function Index() {
           aria-modal="true"
           aria-labelledby="user-login-title"
         >
-          <div className="patient-login-card">
+          <div className="patient-login-card ds-glass">
             <h2 id="user-login-title" className="patient-login-title">
               {loginDialogRole === 'THERAPIST' ? 'Therapist Login' : 'Patient Login'}
             </h2>

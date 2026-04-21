@@ -23,7 +23,7 @@ It includes flex box direction as well to center the content
   font: inherit;
   font-size: 16px;
   padding: 10px 22px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--accent);
   background: var(--accent-bg);
@@ -35,7 +35,7 @@ It includes flex box direction as well to center the content
   font: inherit;
   font-size: 16px;
   padding: 10px 22px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--accent);
   background: var(--accent-bg);
@@ -73,13 +73,13 @@ It includes flex box direction as well to center the content
 
 .index-error-message {
   margin-top: 10px;
-  color: #c2410c;
+  color: var(--color-on-error-container);
 }
 
 .patient-login-modal {
   position: fixed;
   inset: 0;
-  background: rgba(8, 6, 13, 0.5);
+  background: color-mix(in srgb, var(--color-on-surface) 45%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,11 +89,7 @@ It includes flex box direction as well to center the content
 
 .patient-login-card {
   width: min(100%, 420px);
-  padding: 24px;
-  border-radius: 18px;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow);
+  padding: var(--space-xl);
   text-align: left;
 }
 
@@ -117,9 +113,9 @@ It includes flex box direction as well to center the content
 .patient-login-field input {
   font: inherit;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 12px 14px;
-  background: var(--bg);
+  background: var(--surface-container-low);
   color: var(--text-h);
 }
 
@@ -140,7 +136,7 @@ It includes flex box direction as well to center the content
 .patient-login-submit-btn {
   border: none;
   background: var(--accent);
-  color: white;
+  color: #fff;
 }
 
 .patient-login-submit-btn:disabled {

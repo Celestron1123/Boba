@@ -87,7 +87,11 @@ export default function CheckInForm({
         <legend>Mood</legend>
         <div className="check-in-mood-options">
           {MOOD_OPTIONS.map((option) => (
-            <label key={option.value} className="check-in-mood-option">
+            <label
+              key={option.value}
+              className="check-in-mood-option"
+              data-mood={option.value}
+            >
               <input
                 type="radio"
                 name="emoji"
