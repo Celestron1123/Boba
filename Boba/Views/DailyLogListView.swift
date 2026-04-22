@@ -2,10 +2,11 @@ import SwiftUI
 import FirebaseFirestore
 
 struct DailyLogListView: View {
+    @EnvironmentObject var session: SessionManager
     @State private var logs: [DailyLog] = []
     @State private var isLoading: Bool = true
     @State private var errorMessage: String? = nil
-
+    
     var body: some View {
         ZStack {
             // Foundational Canvas
@@ -23,7 +24,7 @@ struct DailyLogListView: View {
                 .frame(width: 250, height: 250)
                 .blur(radius: 60)
                 .position(x: 50, y: 600)
-                
+            
             VStack(spacing: 0) {
                 headerSection
                 
@@ -86,20 +87,31 @@ struct DailyLogListView: View {
     }
     
     @MainActor private func fetchLogs() {
-        let db = Firestore.firestore()
-        db.collection("logs").order(by: "date", descending: true).getDocuments { snapshot, error in
-            DispatchQueue.main.async {
-                self.isLoading = false
-                if let error = error {
-                    self.errorMessage = "Error loading logs: \(error.localizedDescription)"
-                    return
-                }
-
-                self.logs = snapshot?.documents.compactMap { doc in
-                    try? doc.data(as: DailyLog.self)
-                } ?? []
-            }
+        guard let userId = session.currentUserId else {
+            self.isLoading = false
+            self.errorMessage = "User session not found."
+            return
         }
+        
+        let db = Firestore.firestore()
+        db.collection("users")
+            .document(userId)
+            .collection("logs")
+            .order(by: "date", descending: true)
+            .getDocuments { snapshot, error in
+                
+                DispatchQueue.main.async {
+                    self.isLoading = false
+                    if let error = error {
+                        self.errorMessage = "Error loading logs: \(error.localizedDescription)"
+                        return
+                    }
+                    
+                    self.logs = snapshot?.documents.compactMap { doc in
+                        try? doc.data(as: DailyLog.self)
+                    } ?? []
+                }
+            }
     }
 }
 
@@ -153,7 +165,7 @@ struct LogCard: View {
             }
         }
         .padding(24)
-        .glassCard() // Reused component to maintain Liquid Glass strategy
+        .glassCard()
     }
     
     private func formatDate(_ date: Date) -> String {
