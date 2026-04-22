@@ -1,5 +1,6 @@
 import SwiftUI
 import FirebaseFirestore
+import FirebaseAuth
 
 struct DailyLogView: View {
     @State private var selectedMood: String = ""
@@ -8,6 +9,7 @@ struct DailyLogView: View {
     //@State private var hydrationLevel: Double = 1.2
     //@State private var sleepHours: Double = 7.5
     @State private var isSubmitting: Bool = false
+    @EnvironmentObject var session: SessionManager
     
     private let moodOptions: [MoodOption] = [
         .init(key: "AWFUL", icon: "face.terrible", color: .moodTerrible),
@@ -316,6 +318,11 @@ private struct MoodCard: View {
 
 extension DailyLogView {
     func submitLog() {
+        guard let userId = session.currentUserId else {
+                print("No manual session found")
+                return
+            }
+        
         // Prevent double-submissions
         guard !isSubmitting else { return }
         isSubmitting = true
@@ -332,18 +339,18 @@ extension DailyLogView {
         let db = Firestore.firestore()
         
         do {
-            try db.collection("logs").addDocument(from: newLog) { error in
-                isSubmitting = false
-                if let error = error {
-                    print("Error saving log: \(error.localizedDescription)")
-                } else {
-                    print("Successfully saved daily log!")
+                try db.collection("users").document(userId).collection("logs").addDocument(from: newLog) { error in
+                    isSubmitting = false
+                    if let error = error {
+                        print("Error: \(error.localizedDescription)")
+                    } else {
+                        print("Successfully saved to sub-collection!")
+                    }
                 }
+            } catch {
+                print("Error encoding log: \(error)")
+                isSubmitting = false
             }
-        } catch {
-            print("Error encoding log: \(error)")
-            isSubmitting = false
-        }
     }
 }
 
