@@ -7,23 +7,31 @@
 
 import SwiftUI
 import FirebaseCore
-import FirebaseFirestore
+import FirebaseAuth
 
-// connecting Boba to firebase
 class AppDelegate: NSObject, UIApplicationDelegate {
-  func application(_ application: UIApplication,
-                   didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-    FirebaseApp.configure()
-    return true
-  }
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        return true
+    }
 }
 
 @main
 struct BobaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
+    @StateObject var session = SessionManager()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if session.isLoggedIn {
+                    ContentView()
+                } else {
+                    LoginView()
+                }
+            }
+            .environmentObject(session)
         }
     }
 }

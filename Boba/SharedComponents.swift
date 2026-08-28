@@ -1,9 +1,20 @@
+/**
+ SharedComponents.swift
+ 
+ Common UI components shared across screens (top app bar, bottom navigation, shapes).
+ - Uses Liquid Glass for bars and surfaces
+ - Applies design system tokens for elevation and consistency
+ 
+ Last Updated: April 2, 2026
+ */
 import SwiftUI
 
+// Top application bar with title and actions, styled with Liquid Glass
 struct TopAppBar: View {
     var title: String = "Good morning, Alex"
     
     var body: some View {
+        // Leading avatar, title, and trailing notification action
         HStack(spacing: 12) {
             Image(systemName: "person.circle.fill")
                 .resizable()
@@ -24,8 +35,10 @@ struct TopAppBar: View {
                     .font(.system(size: 24))
             }
         }
+        // Comfortable hit-target padding for the bar
         .padding(.horizontal, 24)
         .padding(.vertical, 16)
+        // Liquid Glass background spanning under the status bar
         .background(
             Color.themeSurface.opacity(0.7)
                 .background(.ultraThinMaterial)
@@ -34,12 +47,14 @@ struct TopAppBar: View {
     }
 }
 
+// Bottom navigation bar with four primary destinations
 struct BottomNavBar: View {
     @Binding var selectedIndex: Int
     
     var body: some View {
         HStack {
-            ForEach(0..<4) { index in
+            // Iterate icons and apply selected state styling
+            ForEach(0..<5) { index in
                 Spacer()
                 Button(action: {
                     withAnimation(.spring()) {
@@ -67,28 +82,25 @@ struct BottomNavBar: View {
             }
         }
         .padding(.vertical, 8)
-        .background(
-            Color.themeSurface.opacity(0.7)
-                .background(.ultraThinMaterial)
-                .clipShape(Capsule())
-                .overlay(Capsule().stroke(Color.white.opacity(0.2), lineWidth: 1))
-                .shadow(color: .black.opacity(0.1), radius: 20, x: 0, y: 10)
-        )
+        // Liquid Glass capsule background with design system elevation
+        .glassEffect(.regular.tint(Color.themeSurface.opacity(0.2)).interactive(), in: .capsule)
+        .shadow(color: DS.Shadow.card.color, radius: DS.Shadow.card.radius, x: DS.Shadow.card.x, y: DS.Shadow.card.y)
         .padding(.horizontal, 20)
     }
     
     func iconName(for index: Int) -> String {
         switch index {
         case 0: return "house.fill"
-        case 1: return "calendar"
-        case 2: return "message.fill"
-        case 3: return "person.fill"
+        case 1: return "list.bullet"
+        case 2: return "calendar"
+        case 3: return "message.fill"
+        case 4: return "person.fill"
         default: return "house.fill"
         }
     }
 }
 
-// Allows masking with specific rounded corners, e.g. chat bubbles
+// Utility shape to round specific corners (for chat bubbles, tags, etc.)
 struct RoundedCornerStyle: Shape {
     var radius: CGFloat = .infinity
     var corners: UIRectCorner = .allCorners

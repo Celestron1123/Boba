@@ -1,11 +1,16 @@
 import SwiftUI
+import FirebaseFirestore
+import FirebaseAuth
 
 struct AppointmentsView: View {
     let days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
     let dates = Array(1...12)
+    // this is a test account that is already in the database
+    let testUserID = "DIcDBezlyUSKuHO7WdsGizkEuzl1"
     @State private var selectedDate = 3
     @State private var selectedTime = "10:00 AM"
-
+    @State private var showConfirmation = false
+    
     var body: some View {
         ZStack {
             Color.themeSurface.ignoresSafeArea()
@@ -42,6 +47,11 @@ struct AppointmentsView: View {
                     .padding(.top, 24)
                 }
             }
+        }.alert("Appointment Confirmed", isPresented: $showConfirmation) {
+            Button("Done", role: .cancel) {
+            }
+        } message: {
+            Text("You are all set for \(selectedTime) on October \(selectedDate). Dr. Smith looks forward to seeing you!")
         }
     }
     
@@ -81,10 +91,14 @@ struct AppointmentsView: View {
             Spacer()
         }
         .padding(24)
-        .background(Color.themeSurfaceContainerLow)
-        .cornerRadius(24)
-        .shadow(color: .themeOnSurface.opacity(0.06), radius: 32, x: 0, y: 12)
+        .glassEffect(.regular.tint(Color.themeSurface.opacity(0.2)).interactive(), in: .rect(cornerRadius: DS.Radius.lg))
+        .shadow(color: DS.Shadow.card.color, radius: DS.Shadow.card.radius, x: DS.Shadow.card.x, y: DS.Shadow.card.y)
     }
+    
+    //var upcomingAppointments: some View {
+    /// TO: DO
+    /// Appointment information will be pulled from database
+    //}
     
     var calendarSection: some View {
         VStack(spacing: 16) {
@@ -139,7 +153,6 @@ struct AppointmentsView: View {
         }
         .padding(24)
         .glassCard()
-        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.themeOutlineVariant.opacity(0.15), lineWidth: 1))
     }
     
     var timeSlotsSection: some View {
@@ -180,8 +193,10 @@ struct AppointmentsView: View {
                     .foregroundColor(.themeOnSurface)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 16)
-                    .background(Color.themeSurface.opacity(0.7).background(.ultraThinMaterial))
-                    .cornerRadius(12)
+                //                    .background(Color.themeSurface.opacity(0.7).background(.ultraThinMaterial))
+                //                    .cornerRadius(12)
+                    .glassEffect(.regular.tint(Color.themeSurface.opacity(0.2)).interactive(),
+                                 in: .rect(cornerRadius: DS.Radius.md))
                     .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.4), lineWidth: 1))
                     .opacity(0.4)
             }
@@ -190,7 +205,9 @@ struct AppointmentsView: View {
     
     var ctaSection: some View {
         VStack(spacing: 16) {
-            Button(action: {}) {
+            Button(action: {
+                scheduleAppointment()
+            }) {
                 Text("Schedule Appointment")
                     .headlineText(size: 18, weight: .bold)
                     .foregroundColor(.white)
@@ -207,5 +224,34 @@ struct AppointmentsView: View {
         }
         .padding(.top, 8)
     }
+    
+    func scheduleAppointment() {
+        let uid = testUserID
+            
+        let newAppointment = Appointment(
+            Date: Date(),
+            Patient: uid,
+            Provider: "Dr. Smith",
+            Time: selectedTime,
+        )
+        
+        let db = Firestore.firestore()
+        do {
+            try db.collection("appointments").addDocument(from: newAppointment) { error in
+                if let error = error {
+                    print("Firestore Error: \(error.localizedDescription)")
+                } else {
+                    print("Success! Appointment for \(selectedTime) added to database.")
+                    DispatchQueue.main.async {
+                        self.showConfirmation = true
+                        let generator = UINotificationFeedbackGenerator()
+                        generator.notificationOccurred(.success)
+                    }
+                }
+            }
+        } catch {
+            print("Encoding Error: \(error.localizedDescription)")
+        }
+    }
+    
 }
-
