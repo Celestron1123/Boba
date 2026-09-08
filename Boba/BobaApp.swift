@@ -21,14 +21,16 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct BobaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var session = SessionManager()
-
+    
     var body: some Scene {
         WindowGroup {
             Group {
                 if session.isLoggedIn {
                     ContentView()
                 } else {
-                    LoginView()
+                    NavigationStack {
+                        LoginView()
+                    }
                 }
             }
             .environmentObject(session)

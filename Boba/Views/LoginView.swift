@@ -92,6 +92,16 @@ struct LoginView: View {
                 .glassCard()
                 
                 // Footer
+                HStack(spacing: DS.Spacing.xs) {
+                    Text("Don't have an account?")
+                        .foregroundColor(.themeOnSurfaceVariant)
+                                        
+                    NavigationLink(destination: SignUpView()) {
+                        Text("Sign Up")
+                            .bodyTextStyle(weight: .bold)
+                            .foregroundColor(.themeSecondary)
+                    }
+                }
 
                 .bodyTextStyle(weight: .medium)
                 .foregroundColor(.themeSecondary)
