@@ -13,28 +13,21 @@ class SessionManager: ObservableObject {
     @Published var isLoggedIn: Bool = false
     @Published var currentUserId: String?
     
-    private let db = Firestore.firestore()
-    
     func login(email: String, password: String, completion: @escaping (String?) -> Void) {
-        
-        db.collection("users")
-            .whereField("username", isEqualTo: email)
-            .whereField("password", isEqualTo: password)
-            .getDocuments { snapshot, error in
-                if let error = error {
+        AuthManager.shared.logIn(email: email, password: password) { [weak self] result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    self?.currentUserId = user.uid
+                    self?.isLoggedIn = true
+                    completion(nil)
+                    
+                case .failure(let error):
+                    self?.isLoggedIn = false
+                    self?.currentUserId = nil
                     completion(error.localizedDescription)
-                    return
-                }
-                
-                if let document = snapshot?.documents.first {
-                    DispatchQueue.main.async {
-                        self.currentUserId = document.documentID // Use the Firestore Doc ID
-                        self.isLoggedIn = true
-                        completion(nil)
-                    }
-                } else {
-                    completion("Invalid username or password.")
                 }
             }
+        }
     }
 }
