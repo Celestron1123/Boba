@@ -40,12 +40,20 @@ class AuthManager {
     }
 
     // Save profile details to Firestore
-    func createUserProfile(user: User, username: String, completion: ((Error?) -> Void)? = nil) {
+    func createUserProfile(
+        user: User,
+        firstName: String,
+        lastName: String,
+        birthday: Date,
+        completion: ((Error?) -> Void)? = nil
+    ) {
         let db = Firestore.firestore()
         let userData: [String: Any] = [
             "uid": user.uid,
             "email": user.email ?? "",
-            "username": username,
+            "firstName": firstName,
+            "lastName": lastName,
+            "birthday": Timestamp(date: birthday),
             "createdAt": FieldValue.serverTimestamp()
         ]
         

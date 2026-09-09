@@ -5,11 +5,10 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
 
 struct LoginView: View {
     @EnvironmentObject var session: SessionManager
-    @State private var username: String = ""
+    @State private var email: String = ""
     @State private var password: String = ""
     @State private var isLoading: Bool = false
     @State private var errorMessage: String? = nil
@@ -42,15 +41,18 @@ struct LoginView: View {
                     
                     // Input Fields
                     VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                        Label("Username", systemImage: "person")
+                        Label("Email", systemImage: "envelope")
                             .bodyTextStyle(weight: .medium)
                             .foregroundColor(.themePrimary)
                         
-                        TextField("Enter your username", text: $username)
+                        TextField("Enter your email", text: $email)
                             .padding()
                             .background(Color.themeSurface.opacity(0.5))
                             .cornerRadius(DS.Radius.sm)
+                            .keyboardType(.emailAddress)
                             .textInputAutocapitalization(.never)
+                            .autocorrectionDisabled()
+                            .textContentType(.emailAddress)
                     }
                     
                     VStack(alignment: .leading, spacing: DS.Spacing.sm) {
@@ -62,6 +64,7 @@ struct LoginView: View {
                             .padding()
                             .background(Color.themeSurface.opacity(0.5))
                             .cornerRadius(DS.Radius.sm)
+                            .textContentType(.password)
                     }
                     
                     if let error = errorMessage {
@@ -114,7 +117,7 @@ struct LoginView: View {
         isLoading = true
         errorMessage = nil
         
-        session.login(email: username, password: password) { error in
+        session.login(email: email, password: password) { error in
                 isLoading = false
                 if let error = error {
                     self.errorMessage = error
@@ -131,4 +134,3 @@ struct LoginView_Previews: PreviewProvider {
             .environmentObject(SessionManager())
     }
 }
-

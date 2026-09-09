@@ -8,10 +8,14 @@
  Last Updated: April 2, 2026
  */
 import SwiftUI
+import FirebaseFirestore
 
 // Top application bar with title and actions, styled with Liquid Glass
 struct TopAppBar: View {
-    var title: String = "Good morning, Alex"
+    @EnvironmentObject private var session: SessionManager
+    @State private var patientFirstName = ""
+
+    var title: String? = nil
     
     var body: some View {
         // Leading avatar, title, and trailing notification action
@@ -22,7 +26,7 @@ struct TopAppBar: View {
                 .foregroundColor(.themeSurfaceContainerHighest)
                 .clipShape(Circle())
             
-            Text(title)
+            Text(displayedTitle)
                 .headlineText(size: 24, weight: .bold)
                 .foregroundColor(.themePrimary)
                 .tracking(-0.5)
@@ -44,6 +48,43 @@ struct TopAppBar: View {
                 .background(.ultraThinMaterial)
                 .ignoresSafeArea(edges: .top)
         )
+        .task(id: session.currentUserId) {
+            loadPatientName()
+        }
+    }
+
+    private var displayedTitle: String {
+        if let title {
+            return title
+        }
+
+        return patientFirstName.isEmpty
+            ? "Good morning"
+            : "Good morning, \(patientFirstName)"
+    }
+
+    private func loadPatientName() {
+        guard let userID = session.currentUserId else {
+            patientFirstName = ""
+            return
+        }
+
+        Firestore.firestore()
+            .collection("users")
+            .document(userID)
+            .getDocument { snapshot, _ in
+                guard let data = snapshot?.data() else {
+                    return
+                }
+
+                let firstName = data["firstName"] as? String
+                    ?? data["username"] as? String
+                    ?? ""
+
+                DispatchQueue.main.async {
+                    patientFirstName = firstName
+                }
+            }
     }
 }
 

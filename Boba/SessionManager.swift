@@ -5,7 +5,6 @@
 //  Created by Julia Maia on 4/15/26.
 //
 import FirebaseAuth
-import FirebaseFirestore
 import SwiftUI
 import Combine
 
@@ -14,20 +13,41 @@ class SessionManager: ObservableObject {
     @Published var currentUserId: String?
     
     func login(email: String, password: String, completion: @escaping (String?) -> Void) {
-        AuthManager.shared.logIn(email: email, password: password) { [weak self] result in
+        let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedEmail.isEmpty, !password.isEmpty else {
+            completion("Please enter your email and password.")
+            return
+        }
+
+        AuthManager.shared.logIn(email: trimmedEmail, password: password) { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let user):
                     self?.currentUserId = user.uid
                     self?.isLoggedIn = true
                     completion(nil)
-                    
+
                 case .failure(let error):
-                    self?.isLoggedIn = false
-                    self?.currentUserId = nil
+                    self?.clearSession()
                     completion(error.localizedDescription)
                 }
             }
         }
+    }
+
+    func logout() -> String? {
+        do {
+            try AuthManager.shared.signOut()
+            clearSession()
+            return nil
+        } catch {
+            return error.localizedDescription
+        }
+    }
+
+    private func clearSession() {
+        isLoggedIn = false
+        currentUserId = nil
     }
 }
