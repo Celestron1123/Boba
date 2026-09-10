@@ -1,7 +1,18 @@
-//
-//  SignUpView.swift
-//  Boba
-//
+/**
+ * SignUpView.swift
+ *
+ * Overview: Guides new users through selecting an account role and entering
+ * the information required to create a Boba account.
+ *
+ * Contains:
+ * - Patient and therapist role definitions and account draft data.
+ * - Account-detail, consent, validation, and loading state.
+ * - Firebase user creation and transition to the next onboarding step.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
 
 import SwiftUI
 import FirebaseAuth

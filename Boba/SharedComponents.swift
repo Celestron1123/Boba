@@ -1,11 +1,17 @@
 /**
- SharedComponents.swift
- 
- Common UI components shared across screens (top app bar, bottom navigation, shapes).
- - Uses Liquid Glass for bars and surfaces
- - Applies design system tokens for elevation and consistency
- 
- Last Updated: April 2, 2026
+ * SharedComponents.swift
+ *
+ * Overview: Provides reusable SwiftUI building blocks shared by the Boba app's
+ * screens and navigation flows.
+ *
+ * Contains:
+ * - The top application bar and bottom navigation bar.
+ * - Shared cards, buttons, shapes, indicators, and supporting view helpers.
+ * - Firestore-backed display details and styling based on the design system.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
  */
 import SwiftUI
 import FirebaseFirestore

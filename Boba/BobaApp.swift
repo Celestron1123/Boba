@@ -1,9 +1,18 @@
-//
-//  BobaApp.swift
-//  Boba
-//
-//  Created by Elijah Potter on 1/19/26.
-//
+/**
+ * BobaApp.swift
+ *
+ * Overview: Defines the application entry point and initializes the services
+ * needed before the Boba interface is displayed.
+ *
+ * Contains:
+ * - Firebase application configuration through the app delegate.
+ * - Session-aware routing between authentication and the main application.
+ * - Scene lifecycle handling for email verification refreshes.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
 
 import SwiftUI
 import FirebaseCore

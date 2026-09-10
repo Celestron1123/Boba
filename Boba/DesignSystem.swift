@@ -1,12 +1,17 @@
 /**
- DesignSystem.swift
- 
- Centralized design tokens and view modifiers for consistent theming across the app.
- - Defines palette colors and gradients
- - Provides a hex-based Color initializer
- - Adds reusable glassmorphic card and typography helpers
- 
- Last Updated: April 2, 2026
+ * DesignSystem.swift
+ *
+ * Overview: Centralizes the visual language used throughout the Boba app so
+ * screens share consistent colors, spacing, typography, and surface styling.
+ *
+ * Contains:
+ * - Theme palette, gradients, mood colors, and design-system constants.
+ * - Hex-based Color construction utilities.
+ * - Reusable typography, glass-card, and related view modifiers.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
  */
 import SwiftUI
 
@@ -207,4 +212,3 @@ extension View {
         self.modifier(CustomFontModifier(size: size, weight: weight, isHeadline: false))
     }
 }
-

@@ -1,7 +1,18 @@
-//
-//  LoginView.swift
-//  Boba
-//
+/**
+ * LoginView.swift
+ *
+ * Overview: Provides the sign-in screen for returning Boba users and supports
+ * account recovery when a password has been forgotten.
+ *
+ * Contains:
+ * - Email and password input with validation and loading state.
+ * - Password visibility controls and Firebase sign-in handling.
+ * - Password-reset feedback and navigation into account creation.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
 
 import SwiftUI
 

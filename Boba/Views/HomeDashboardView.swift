@@ -1,3 +1,19 @@
+/**
+ * HomeDashboardView.swift
+ *
+ * Overview: Presents the patient's main Boba dashboard and the most relevant
+ * daily care actions at a glance.
+ *
+ * Contains:
+ * - The welcome hero and daily mood-log entry point.
+ * - Upcoming appointment and medication reminder cards.
+ * - A guided breathing-exercise card and dashboard layout styling.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
+
 import SwiftUI
 
 struct HomeDashboardView: View {
@@ -230,4 +246,3 @@ struct HomeDashboardView: View {
         .shadow(color: .black.opacity(0.05), radius: 20, x: 0, y: 10)
     }
 }
-

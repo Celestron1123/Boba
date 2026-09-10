@@ -1,3 +1,19 @@
+/**
+ * SecureChatView.swift
+ *
+ * Overview: Provides the patient-facing secure conversation interface for
+ * communicating with a care provider.
+ *
+ * Contains:
+ * - Conversation header, message bubbles, and date grouping.
+ * - Secure-chat status and therapist typing indicators.
+ * - Message-entry controls and the surrounding chat layout.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
+
 import SwiftUI
 
 struct SecureChatView: View {

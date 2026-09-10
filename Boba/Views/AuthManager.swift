@@ -1,9 +1,18 @@
-//
-//  AuthManager.swift
-//  Boba
-//
-//  Created by Julia Maia on 9/8/26.
-//
+/**
+ * AuthManager.swift
+ *
+ * Overview: Encapsulates Firebase Authentication operations used by the Boba
+ * app's sign-up, sign-in, verification, and recovery flows.
+ *
+ * Contains:
+ * - A shared authentication manager for coordinating Firebase Auth requests.
+ * - User registration, login, sign-out, and password-reset operations.
+ * - Email-verification refresh and related Firestore profile synchronization.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
 
 import FirebaseFirestore
 import FirebaseAuth

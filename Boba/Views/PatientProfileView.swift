@@ -1,3 +1,19 @@
+/**
+ * PatientProfileView.swift
+ *
+ * Overview: Shows the authenticated patient's profile and care information in
+ * a single scrollable screen.
+ *
+ * Contains:
+ * - Firestore-backed identity, birthday, and contact information.
+ * - Provider, emergency-contact, medication, and diagnosis cards.
+ * - Logout confirmation, error handling, and session termination controls.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
+
 import SwiftUI
 import FirebaseFirestore
 

@@ -1,3 +1,19 @@
+/**
+ * DailyLogView.swift
+ *
+ * Overview: Provides the daily wellness check-in where a patient records a
+ * current mood and optional journal details.
+ *
+ * Contains:
+ * - Mood selection and supporting wellness tracker state.
+ * - Journal-note entry and submission controls.
+ * - Firestore persistence for the submitted DailyLog record.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
+
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth
@@ -353,4 +369,3 @@ extension DailyLogView {
             }
     }
 }
-

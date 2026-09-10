@@ -1,9 +1,18 @@
-//
-//  DailyLog.swift
-//  Boba
-//
-//  Created by Julia Maia on 4/1/26.
-//
+/**
+ * DailyLog.swift
+ *
+ * Overview: Defines the persisted daily wellness journal entry used to record
+ * a patient's mood and reflections.
+ *
+ * Contains:
+ * - A Codable DailyLog model for Firestore serialization.
+ * - Document identity, date, mood, and notes fields, with room for future
+ *   wellness tracking fields.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
 import FirebaseFirestore
 
 struct DailyLog: Codable {

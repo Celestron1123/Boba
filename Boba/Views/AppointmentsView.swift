@@ -1,3 +1,19 @@
+/**
+ * AppointmentsView.swift
+ *
+ * Overview: Presents the appointment-booking experience for selecting a care
+ * provider, date, and available time.
+ *
+ * Contains:
+ * - Practitioner information and appointment availability sections.
+ * - Date and time selection state with confirmation feedback.
+ * - Firestore integration for creating the selected appointment.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
+
 import SwiftUI
 import FirebaseFirestore
 import FirebaseAuth

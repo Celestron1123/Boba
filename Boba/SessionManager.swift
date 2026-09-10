@@ -1,9 +1,18 @@
-//
-//  SessionManager.swift
-//  Boba
-//
-//  Created by Julia Maia on 4/15/26.
-//
+/**
+ * SessionManager.swift
+ *
+ * Overview: Coordinates the authenticated user's session and exposes session
+ * state to SwiftUI views throughout the Boba app.
+ *
+ * Contains:
+ * - Observable login state and the current Firebase user identifier.
+ * - Login, logout, session activation, and email-verification refresh flows.
+ * - Local session cleanup when authentication is no longer valid.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
 import FirebaseAuth
 import SwiftUI
 import Combine

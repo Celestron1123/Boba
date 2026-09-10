@@ -1,3 +1,19 @@
+/**
+ * DailyLogListView.swift
+ *
+ * Overview: Displays a patient's previously submitted wellness journal entries
+ * and communicates loading or retrieval errors.
+ *
+ * Contains:
+ * - Firestore-backed daily-log loading through the active session.
+ * - A scrollable list of mood and reflection entries.
+ * - Loading, empty, and error states for the journal history.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
+
 import SwiftUI
 import FirebaseFirestore
 
