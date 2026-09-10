@@ -21,6 +21,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct BobaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var session = SessionManager()
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
@@ -34,6 +35,10 @@ struct BobaApp: App {
                 }
             }
             .environmentObject(session)
+            .onChange(of: scenePhase) { _, newPhase in
+                guard newPhase == .active else { return }
+                session.refreshEmailVerificationStatus()
+            }
         }
     }
 }

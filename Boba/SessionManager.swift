@@ -24,14 +24,37 @@ class SessionManager: ObservableObject {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let user):
+                    guard user.isEmailVerified else {
+                        try? AuthManager.shared.signOut()
+                        self?.clearSession()
+                        completion("Please verify your email address before signing in.")
+                        return
+                    }
+
                     self?.currentUserId = user.uid
                     self?.isLoggedIn = true
+                    AuthManager.shared.refreshEmailVerificationStatus { _ in }
                     completion(nil)
 
                 case .failure(let error):
                     self?.clearSession()
                     completion(error.localizedDescription)
                 }
+            }
+        }
+    }
+
+    func activateSession(for user: User) {
+        currentUserId = user.uid
+        isLoggedIn = true
+        refreshEmailVerificationStatus()
+    }
+
+    func refreshEmailVerificationStatus() {
+        guard isLoggedIn else { return }
+        AuthManager.shared.refreshEmailVerificationStatus { result in
+            if case .failure(let error) = result {
+                print("Unable to refresh email verification status: \(error.localizedDescription)")
             }
         }
     }
