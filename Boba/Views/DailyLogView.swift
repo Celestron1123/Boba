@@ -4,7 +4,7 @@ import FirebaseAuth
 
 struct DailyLogView: View {
     @State private var selectedMood: String = ""
-    //@State private var selectedTags: Set<String> = [] // Set avoids duplicates
+    @State private var selectedTags: Set<String> = []
     @State private var journalText: String = ""
     //@State private var hydrationLevel: Double = 1.2
     //@State private var sleepHours: Double = 7.5
@@ -115,13 +115,28 @@ struct DailyLogView: View {
             
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 12) {
                 ForEach(tags, id: \.0) { tag in
-                    Text(tag.0)
-                        .bodyText(size: 14, weight: .medium)
-                        .foregroundColor(tag.1)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 10)
-                        .background(tag.2)
-                        .clipShape(Capsule())
+                    let isSelected = selectedTags.contains(tag.0)
+                    
+                    Button(action: {
+                        toggleTag(tag.0)
+                    }) {
+                        Text(tag.0)
+                            .bodyText(size: 14, weight: isSelected ? .bold : .medium)
+                            .foregroundColor(isSelected ? .white : tag.1)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(
+                                isSelected ? Color.themePrimary : tag.2
+                            )
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(isSelected ? Color.themePrimary : Color.clear, lineWidth: 1.5)
+                            )
+                            .scaleEffect(isSelected ? 1.05 : 1.0)
+                    }
+                    .buttonStyle(.plain)
+                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isSelected)
                 }
             }
         }
@@ -330,7 +345,7 @@ extension DailyLogView {
         let newLog = DailyLog(
             date: Date(),
             mood: selectedMood,
-            //tags: Array(selectedTags),
+            tags: Array(selectedTags),
             //hydration: hydrationLevel,
             //sleep: sleepHours,
             notes: journalText
@@ -352,5 +367,13 @@ extension DailyLogView {
                 isSubmitting = false
             }
     }
+    
+    fileprivate func toggleTag(_ tag: String) {
+            if selectedTags.contains(tag) {
+                selectedTags.remove(tag)
+            } else {
+                selectedTags.insert(tag)
+            }
+        }
 }
 
