@@ -20,6 +20,7 @@ import FirebaseFirestore
 struct TopAppBar: View {
     @EnvironmentObject private var session: SessionManager
     @State private var patientFirstName = ""
+    @State private var patientNumber: Int? = nil
 
     var title: String? = nil
     
@@ -32,10 +33,18 @@ struct TopAppBar: View {
                 .foregroundColor(.themeSurfaceContainerHighest)
                 .clipShape(Circle())
             
-            Text(displayedTitle)
-                .headlineText(size: 24, weight: .bold)
-                .foregroundColor(.themePrimary)
-                .tracking(-0.5)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(displayedTitle)
+                    .headlineText(size: 20, weight: .bold)
+                    .foregroundColor(.themePrimary)
+                    .tracking(-0.5)
+                            
+                if let number = patientNumber {
+                    Text("Patient ID: #\(String(format: "%04d", number))")
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.themeOnSurfaceVariant)
+                }
+            }
             
             Spacer()
             
@@ -72,6 +81,7 @@ struct TopAppBar: View {
     private func loadPatientName() {
         guard let userID = session.currentUserId else {
             patientFirstName = ""
+            patientNumber = nil
             return
         }
 
@@ -86,9 +96,11 @@ struct TopAppBar: View {
                 let firstName = data["firstName"] as? String
                     ?? data["username"] as? String
                     ?? ""
+                let number = data["patientNumber"] as? Int
 
                 DispatchQueue.main.async {
                     patientFirstName = firstName
+                    patientNumber = number
                 }
             }
     }
