@@ -34,20 +34,20 @@ class AuthManager {
             }
         }
     }
-
+    
     // Log in an existing user
     func logIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
-        Auth.auth().signIn(withEmail: email, password: password) { result, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            if let user = result?.user {
-                completion(.success(user))
-            }
-        }
-    }
-
+         Auth.auth().signIn(withEmail: email, password: password) { result, error in
+             if let error = error {
+                 completion(.failure(error))
+                 return
+             }
+             if let user = result?.user {
+                 completion(.success(user))
+             }
+         }
+     }
+    
     // Send Firebase's built-in email verification message.
     func sendEmailVerification(completion: @escaping (Error?) -> Void) {
         guard let user = Auth.auth().currentUser else {
@@ -127,7 +127,9 @@ class AuthManager {
         completion: ((Error?) -> Void)? = nil
     ) {
         let db = Firestore.firestore()
-        let userData: [String: Any] = [
+        let userRef = db.collection("users").document(user.uid)
+        
+        var userData: [String: Any] = [
             "uid": user.uid,
             "email": user.email ?? "",
             "firstName": firstName,
@@ -136,16 +138,43 @@ class AuthManager {
             "emailVerified": user.isEmailVerified,
             "createdAt": FieldValue.serverTimestamp()
         ]
-
-        db.collection("users").document(user.uid).setData(userData) { error in
-            if let error = error {
-                print("Error saving profile: \(error.localizedDescription)")
-            } else {
-                print("Profile saved successfully!")
+        
+        guard role == "patient" else {
+            // Therapists just get created normally, no counter needed.
+            userRef.setData(userData) { error in
+                completion?(error)
             }
+            return
+        }
+
+        let counterRef = db.collection("counters").document("patients")
+
+        db.runTransaction({ (transaction, errorPointer) -> Any? in
+            let counterSnapshot: DocumentSnapshot
+            do {
+                counterSnapshot = try transaction.getDocument(counterRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
+                return nil
+            }
+
+            let currentNumber = counterSnapshot.exists ? (counterSnapshot.data()?["lastNumber"] as? Int ?? 0) : 0
+                let nextNumber = currentNumber + 1
+
+                // Prepare all mutations first
+                var updatedUserData = userData
+                updatedUserData["patientNumber"] = nextNumber
+
+                // Execute all writes at the very end
+                transaction.setData(["lastNumber": nextNumber], forDocument: counterRef, merge: true)
+                transaction.setData(updatedUserData, forDocument: userRef)
+
+                return nextNumber
+        }) { (_, error) in
             completion?(error)
         }
     }
+    
 
     // Save the patient onboarding fields. The PIN remains deliberately unavailable.
     func updatePatientProfile(
