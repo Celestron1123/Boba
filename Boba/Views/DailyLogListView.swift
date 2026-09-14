@@ -133,7 +133,10 @@ struct DailyLogListView: View {
 
 // Custom Glassmorphic Card for a single Log
 struct LogCard: View {
+    @EnvironmentObject private var session: SessionManager
     let log: DailyLog
+    @State private var comments: [TherapistAnnotation] = []
+    @State private var commentsListener: ListenerRegistration?
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -179,9 +182,60 @@ struct LogCard: View {
                     .foregroundColor(.themeOnSurfaceVariant) // Workhorse text style
                     .lineSpacing(4)
             }
+
+            if !comments.isEmpty {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Comments from your care team", systemImage: "bubble.left.fill")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundStyle(Color.themePrimary)
+                    ForEach(comments) { comment in
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(comment.text)
+                                .bodyText(size: 14)
+                                .foregroundStyle(Color.themeOnSurfaceVariant)
+                            Text(comment.createdAt.formatted(date: .abbreviated, time: .shortened))
+                                .font(.system(size: 11))
+                                .foregroundStyle(Color.themeOnSurfaceVariant.opacity(0.65))
+                        }
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color.themeTertiaryContainer.opacity(0.16), in: RoundedRectangle(cornerRadius: 14))
+                    }
+                }
+            }
         }
         .padding(24)
         .glassCard()
+        .onAppear { startCommentsListener() }
+        .onDisappear {
+            commentsListener?.remove()
+            commentsListener = nil
+        }
+    }
+
+    private func startCommentsListener() {
+        guard commentsListener == nil,
+              let patientId = session.currentUserId,
+              let logId = log.id else { return }
+
+        commentsListener = Firestore.firestore()
+            .collection("users").document(patientId)
+            .collection("logs").document(logId)
+            .collection("comments")
+            .order(by: "createdAt", descending: true)
+            .addSnapshotListener { snapshot, _ in
+                comments = snapshot?.documents.compactMap { document in
+                    let data = document.data()
+                    guard let text = data["text"] as? String,
+                          let authorId = data["authorId"] as? String else { return nil }
+                    return TherapistAnnotation(
+                        id: document.documentID,
+                        text: text,
+                        authorId: authorId,
+                        createdAt: (data["createdAt"] as? Timestamp)?.dateValue() ?? Date()
+                    )
+                } ?? []
+            }
     }
     
     private func formatDate(_ date: Date) -> String {

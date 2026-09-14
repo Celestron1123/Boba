@@ -244,9 +244,11 @@ struct SignUpView: View {
                     role: role.rawValue
                 ) { profileError in
                     if let profileError {
-                        DispatchQueue.main.async {
-                            isLoading = false
-                            errorMessage = profileError.localizedDescription
+                        AuthManager.shared.deleteCurrentUser { _ in
+                            DispatchQueue.main.async {
+                                isLoading = false
+                                errorMessage = profileError.localizedDescription
+                            }
                         }
                         return
                     }

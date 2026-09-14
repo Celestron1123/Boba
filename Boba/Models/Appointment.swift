@@ -6,8 +6,8 @@
  *
  * Contains:
  * - A Codable and Identifiable Appointment model.
- * - Firestore document identity and appointment date, patient, provider,
- *   and time fields.
+ * - Firestore document identity and normalized patient, provider, and start
+ *   time fields.
  *
  * Date: September 10, 2026
  * Attribution: BOBA t team
@@ -17,9 +17,8 @@ import FirebaseFirestore
 
 struct Appointment: Codable, Identifiable {
     @DocumentID var id: String?
-    var Date: Date
-    var Patient: String
-    var Provider: String
-    var Time: String
-    
+    var patientId: String
+    var therapistId: String?
+    var providerName: String
+    var startAt: Date
 }

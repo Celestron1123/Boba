@@ -11,22 +11,83 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function isTherapist() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "therapist";
+    }
+
+    function isConnected(patientId) {
+      return isTherapist()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/connections/$(patientId));
+    }
+
+    function unchangedIdentity() {
+      return request.resource.data.get("uid", "") == resource.data.get("uid", "")
+        && request.resource.data.get("role", "") == resource.data.get("role", "")
+        && request.resource.data.get("patientNumber", null) == resource.data.get("patientNumber", null);
+    }
+
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      // Spark-compatible prototype concession: authenticated users can read
+      // profiles so a therapist can look up a patient number from the client.
+      allow read: if signedIn();
+      allow create: if isOwner(userId)
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.role in ["patient", "therapist"];
+      allow update: if isOwner(userId) && unchangedIdentity();
+      allow delete: if false;
+
+      match /connections/{patientId} {
+        allow read: if isOwner(userId) && isTherapist();
+        allow create: if isOwner(userId)
+          && isTherapist()
+          && request.resource.data.patientId == patientId;
+        allow delete: if isOwner(userId) && isTherapist();
+        allow update: if false;
+      }
 
       match /logs/{logId} {
-        allow read, create: if isOwner(userId);
+        allow read: if isOwner(userId) || isConnected(userId);
+        allow create: if isOwner(userId);
         allow update, delete: if isOwner(userId);
+
+        match /therapistNotes/{noteId} {
+          allow read: if isConnected(userId)
+            && resource.data.authorId == request.auth.uid;
+          allow create: if isConnected(userId)
+            && request.resource.data.authorId == request.auth.uid
+            && request.resource.data.text is string
+            && request.resource.data.text.size() > 0;
+          allow update, delete: if isConnected(userId)
+            && resource.data.authorId == request.auth.uid
+            && request.resource.data.authorId == request.auth.uid;
+        }
+
+        match /comments/{commentId} {
+          allow read: if isOwner(userId) || isConnected(userId);
+          allow create: if isConnected(userId)
+            && request.resource.data.authorId == request.auth.uid
+            && request.resource.data.text is string
+            && request.resource.data.text.size() > 0;
+          allow update, delete: if isConnected(userId)
+            && resource.data.authorId == request.auth.uid
+            && request.resource.data.authorId == request.auth.uid;
+        }
       }
     }
 
     match /counters/{counterId} {
+      // The client-side patient signup transaction needs this document on the
+      // Spark plan. This is intentionally weaker for the capstone prototype.
       allow read, write: if signedIn();
     }
 
-    // Temporarily fully open so appointment creation works while this feature is being wired up.
     match /appointments/{appointmentId} {
-      allow read, write: if true;
+      allow read: if isOwner(resource.data.patientId)
+        || isConnected(resource.data.patientId);
+      allow create: if signedIn()
+        && request.resource.data.patientId == request.auth.uid;
+      allow update, delete: if isOwner(resource.data.patientId);
     }
   }
 }

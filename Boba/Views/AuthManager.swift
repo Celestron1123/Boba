@@ -128,7 +128,6 @@ class AuthManager {
     ) {
         let db = Firestore.firestore()
         let userRef = db.collection("users").document(user.uid)
-        
         let userData: [String: Any] = [
             "uid": user.uid,
             "email": user.email ?? "",
@@ -136,20 +135,19 @@ class AuthManager {
             "lastName": lastName,
             "role": role,
             "emailVerified": user.isEmailVerified,
-            "createdAt": FieldValue.serverTimestamp()
+            "createdAt": FieldValue.serverTimestamp(),
+            "updatedAt": FieldValue.serverTimestamp()
         ]
-        
+
         guard role == "patient" else {
-            // Therapists just get created normally, no counter needed.
-            userRef.setData(userData) { error in
+            userRef.setData(userData, merge: true) { error in
                 completion?(error)
             }
             return
         }
 
         let counterRef = db.collection("counters").document("patients")
-
-        db.runTransaction({ (transaction, errorPointer) -> Any? in
+        db.runTransaction({ transaction, errorPointer in
             let counterSnapshot: DocumentSnapshot
             do {
                 counterSnapshot = try transaction.getDocument(counterRef)
@@ -158,21 +156,27 @@ class AuthManager {
                 return nil
             }
 
-            let currentNumber = counterSnapshot.exists ? (counterSnapshot.data()?["lastNumber"] as? Int ?? 0) : 0
-                let nextNumber = currentNumber + 1
-
-                // Prepare all mutations first
-                var updatedUserData = userData
-                updatedUserData["patientNumber"] = nextNumber
-
-                // Execute all writes at the very end
-                transaction.setData(["lastNumber": nextNumber], forDocument: counterRef, merge: true)
-                transaction.setData(updatedUserData, forDocument: userRef)
-
-                return nextNumber
-        }) { (_, error) in
+            let currentNumber = counterSnapshot.exists
+                ? counterSnapshot.data()?["lastNumber"] as? Int ?? 0
+                : 0
+            let nextNumber = currentNumber + 1
+            var patientData = userData
+            patientData["patientNumber"] = nextNumber
+            transaction.setData(["lastNumber": nextNumber], forDocument: counterRef, merge: true)
+            transaction.setData(patientData, forDocument: userRef, merge: true)
+            return nextNumber
+        }) { _, error in
             completion?(error)
         }
+    }
+
+    /// Removes an Auth account when initial profile creation fails.
+    func deleteCurrentUser(completion: @escaping (Error?) -> Void) {
+        guard let user = Auth.auth().currentUser else {
+            completion(nil)
+            return
+        }
+        user.delete(completion: completion)
     }
     
 

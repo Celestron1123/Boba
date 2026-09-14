@@ -21,8 +21,6 @@ import FirebaseAuth
 struct AppointmentsView: View {
     let days = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
     let dates = Array(1...12)
-    // this is a test account that is already in the database
-    let testUserID = "DIcDBezlyUSKuHO7WdsGizkEuzl1"
     @State private var selectedDate = 3
     @State private var selectedTime = "10:00 AM"
     @State private var showConfirmation = false
@@ -242,13 +240,13 @@ struct AppointmentsView: View {
     }
     
     func scheduleAppointment() {
-        let uid = testUserID
-            
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+
         let newAppointment = Appointment(
-            Date: Date(),
-            Patient: uid,
-            Provider: "Dr. Smith",
-            Time: selectedTime,
+            patientId: uid,
+            therapistId: nil,
+            providerName: "Dr. Smith",
+            startAt: Date().addingTimeInterval(60 * 60)
         )
         
         let db = Firestore.firestore()

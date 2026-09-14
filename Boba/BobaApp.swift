@@ -36,7 +36,16 @@ struct BobaApp: App {
         WindowGroup {
             Group {
                 if session.isLoggedIn {
-                    ContentView()
+                    if session.isLoadingRole {
+                        ProgressView("Loading your workspace…")
+                            .tint(.themePrimary)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.themeSurface.ignoresSafeArea())
+                    } else if session.userRole == .therapist {
+                        TherapistContentView()
+                    } else {
+                        ContentView()
+                    }
                 } else {
                     NavigationStack {
                         LoginView()

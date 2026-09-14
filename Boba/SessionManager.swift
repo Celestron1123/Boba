@@ -14,12 +14,15 @@
  * Copyright: Copyright © 2026 BOBA t. All rights reserved.
  */
 import FirebaseAuth
+import FirebaseFirestore
 import SwiftUI
 import Combine
 
 class SessionManager: ObservableObject {
     @Published var isLoggedIn: Bool = false
     @Published var currentUserId: String?
+    @Published var userRole: UserRole?
+    @Published var isLoadingRole = false
     
     func login(email: String, password: String, completion: @escaping (String?) -> Void) {
         let trimmedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -40,8 +43,7 @@ class SessionManager: ObservableObject {
                         return
                     }
 
-                    self?.currentUserId = user.uid
-                    self?.isLoggedIn = true
+                    self?.activateSession(for: user)
                     AuthManager.shared.refreshEmailVerificationStatus { _ in }
                     completion(nil)
 
@@ -56,6 +58,9 @@ class SessionManager: ObservableObject {
     func activateSession(for user: User) {
         currentUserId = user.uid
         isLoggedIn = true
+        userRole = nil
+        isLoadingRole = true
+        loadRole(for: user.uid)
         refreshEmailVerificationStatus()
     }
 
@@ -81,5 +86,29 @@ class SessionManager: ObservableObject {
     private func clearSession() {
         isLoggedIn = false
         currentUserId = nil
+        userRole = nil
+        isLoadingRole = false
+    }
+
+    private func loadRole(for userID: String) {
+        Firestore.firestore()
+            .collection("users")
+            .document(userID)
+            .getDocument { [weak self] snapshot, error in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.isLoadingRole = false
+                    if let error {
+                        print("Unable to load user role: \(error.localizedDescription)")
+                        return
+                    }
+                    guard let roleValue = snapshot?.data()?["role"] as? String,
+                          let role = UserRole(rawValue: roleValue) else {
+                        print("User profile does not contain a valid role.")
+                        return
+                    }
+                    self.userRole = role
+                }
+            }
     }
 }
