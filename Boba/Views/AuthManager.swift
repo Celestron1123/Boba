@@ -129,7 +129,7 @@ class AuthManager {
         let db = Firestore.firestore()
         let userRef = db.collection("users").document(user.uid)
         
-        var userData: [String: Any] = [
+        let userData: [String: Any] = [
             "uid": user.uid,
             "email": user.email ?? "",
             "firstName": firstName,
