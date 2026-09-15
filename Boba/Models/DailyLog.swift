@@ -20,7 +20,7 @@ struct DailyLog: Codable {
     var date: Date
     var mood: String
     var tags: [String]
-    //var hydration: Double
-    //var sleep: Double
+    var hydration: Double
+    var sleep: Double
     var notes: String
 }

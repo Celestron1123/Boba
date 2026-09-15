@@ -24,8 +24,8 @@ struct DailyLogView: View {
     @State private var selectedMood: String = ""
     @State private var selectedTags: Set<String> = []
     @State private var journalText: String = ""
-    //@State private var hydrationLevel: Double = 1.2
-    //@State private var sleepHours: Double = 7.5
+    @State private var hydrationLevel: Double = 1.2
+    @State private var sleepHours: Double = 7.0
     @State private var isSubmitting: Bool = false
     @EnvironmentObject var session: SessionManager
     
@@ -172,12 +172,18 @@ struct DailyLogView: View {
                     value: "1.2",
                     unit: "L",
                     title: "HYDRATION",
-                    progress: 0.6,
+                    progress: min(hydrationLevel / 2.5, 1.0),
                     progressGradient: LinearGradient(
                         colors: [.themeTertiaryContainer, .themeTertiary],
                         startPoint: .leading,
                         endPoint: .trailing
-                    )
+                    ),
+                    onDecrement: {
+                        if hydrationLevel >= 0.1 { hydrationLevel -= 0.1 }
+                    },
+                    onIncrement: {
+                        if hydrationLevel < 5.0 { hydrationLevel += 0.1 }
+                    }
                 )
                 
                 trackerCard(
@@ -186,12 +192,18 @@ struct DailyLogView: View {
                     value: "7.5",
                     unit: "hrs",
                     title: "SLEEP QUALITY",
-                    progress: 0.85,
+                    progress: min(sleepHours / 9.0, 1.0),
                     progressGradient: LinearGradient(
                         colors: [.themeSecondaryContainer, .themeSecondary],
                         startPoint: .leading,
                         endPoint: .trailing
-                    )
+                    ),
+                    onDecrement: {
+                        if sleepHours >= 0.5 { sleepHours -= 0.5 }
+                    },
+                    onIncrement: {
+                        if sleepHours < 16.0 { sleepHours += 0.5 }
+                    }
                 )
             }
         }
@@ -204,7 +216,9 @@ struct DailyLogView: View {
         unit: String,
         title: String,
         progress: Double,
-        progressGradient: LinearGradient
+        progressGradient: LinearGradient,
+        onDecrement: @escaping () -> Void,
+        onIncrement: @escaping () -> Void
     ) -> some View {
         VStack(alignment: .leading) {
             HStack(alignment: .top) {
@@ -223,7 +237,23 @@ struct DailyLogView: View {
                 }
             }
             
-            Spacer()
+            HStack(spacing: 12) {
+                Button(action: onDecrement) {
+                    Image(systemName: "minus.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.themeOnSurfaceVariant.opacity(0.7))
+                }
+                
+                Spacer()
+                
+                Button(action: onIncrement) {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.themeOnSurfaceVariant.opacity(0.7))
+                }
+            }
+            .buttonStyle(.plain)
+            .padding(.vertical, 4)
             
             VStack(spacing: 8) {
                 HStack {
@@ -364,8 +394,8 @@ extension DailyLogView {
             date: Date(),
             mood: selectedMood,
             tags: Array(selectedTags),
-            //hydration: hydrationLevel,
-            //sleep: sleepHours,
+            hydration: hydrationLevel,
+            sleep: sleepHours,
             notes: journalText
         )
         
