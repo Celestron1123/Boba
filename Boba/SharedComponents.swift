@@ -1,17 +1,28 @@
 /**
- SharedComponents.swift
- 
- Common UI components shared across screens (top app bar, bottom navigation, shapes).
- - Uses Liquid Glass for bars and surfaces
- - Applies design system tokens for elevation and consistency
- 
- Last Updated: April 2, 2026
+ * SharedComponents.swift
+ *
+ * Overview: Provides reusable SwiftUI building blocks shared by the Boba app's
+ * screens and navigation flows.
+ *
+ * Contains:
+ * - The top application bar and bottom navigation bar.
+ * - Shared cards, buttons, shapes, indicators, and supporting view helpers.
+ * - Firestore-backed display details and styling based on the design system.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
  */
 import SwiftUI
+import FirebaseFirestore
 
 // Top application bar with title and actions, styled with Liquid Glass
 struct TopAppBar: View {
-    var title: String = "Good morning, Alex"
+    @EnvironmentObject private var session: SessionManager
+    @State private var patientFirstName = ""
+    @State private var patientNumber: Int? = nil
+
+    var title: String? = nil
     
     var body: some View {
         // Leading avatar, title, and trailing notification action
@@ -22,10 +33,18 @@ struct TopAppBar: View {
                 .foregroundColor(.themeSurfaceContainerHighest)
                 .clipShape(Circle())
             
-            Text(title)
-                .headlineText(size: 24, weight: .bold)
-                .foregroundColor(.themePrimary)
-                .tracking(-0.5)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(displayedTitle)
+                    .headlineText(size: 20, weight: .bold)
+                    .foregroundColor(.themePrimary)
+                    .tracking(-0.5)
+                            
+                if let number = patientNumber {
+                    Text("Patient ID: #\(String(format: "%04d", number))")
+                        .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                        .foregroundColor(.themeOnSurfaceVariant)
+                }
+            }
             
             Spacer()
             
@@ -44,6 +63,46 @@ struct TopAppBar: View {
                 .background(.ultraThinMaterial)
                 .ignoresSafeArea(edges: .top)
         )
+        .task(id: session.currentUserId) {
+            loadPatientName()
+        }
+    }
+
+    private var displayedTitle: String {
+        if let title {
+            return title
+        }
+
+        return patientFirstName.isEmpty
+            ? "Good morning"
+            : "Good morning, \(patientFirstName)"
+    }
+
+    private func loadPatientName() {
+        guard let userID = session.currentUserId else {
+            patientFirstName = ""
+            patientNumber = nil
+            return
+        }
+
+        Firestore.firestore()
+            .collection("users")
+            .document(userID)
+            .getDocument { snapshot, _ in
+                guard let data = snapshot?.data() else {
+                    return
+                }
+
+                let firstName = data["firstName"] as? String
+                    ?? data["username"] as? String
+                    ?? ""
+                let number = data["patientNumber"] as? Int
+
+                DispatchQueue.main.async {
+                    patientFirstName = firstName
+                    patientNumber = number
+                }
+            }
     }
 }
 

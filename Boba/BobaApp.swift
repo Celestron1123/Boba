@@ -1,9 +1,18 @@
-//
-//  BobaApp.swift
-//  Boba
-//
-//  Created by Elijah Potter on 1/19/26.
-//
+/**
+ * BobaApp.swift
+ *
+ * Overview: Defines the application entry point and initializes the services
+ * needed before the Boba interface is displayed.
+ *
+ * Contains:
+ * - Firebase application configuration through the app delegate.
+ * - Session-aware routing between authentication and the main application.
+ * - Scene lifecycle handling for email verification refreshes.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
 
 import SwiftUI
 import FirebaseCore
@@ -21,17 +30,33 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 struct BobaApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     @StateObject var session = SessionManager()
-
+    @Environment(\.scenePhase) private var scenePhase
+    
     var body: some Scene {
         WindowGroup {
             Group {
                 if session.isLoggedIn {
-                    ContentView()
+                    if session.isLoadingRole {
+                        ProgressView("Loading your workspace…")
+                            .tint(.themePrimary)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.themeSurface.ignoresSafeArea())
+                    } else if session.userRole == .therapist {
+                        TherapistContentView()
+                    } else {
+                        ContentView()
+                    }
                 } else {
-                    LoginView()
+                    NavigationStack {
+                        LoginView()
+                    }
                 }
             }
             .environmentObject(session)
+            .onChange(of: scenePhase) { _, newPhase in
+                guard newPhase == .active else { return }
+                session.refreshEmailVerificationStatus()
+            }
         }
     }
 }

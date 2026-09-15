@@ -1,11 +1,17 @@
 /**
- ContentView.swift
- 
- Primary container view that hosts the app's main sections and bottom navigation.
- - Displays the appropriate section based on `selectedIndex` using a switch.
- - Anchors a custom bottom navigation bar with `safeAreaInset`.
- 
- Last Updated: April 2, 2026
+ * ContentView.swift
+ *
+ * Overview: Acts as the authenticated root container for the app's primary
+ * sections and keeps tab navigation in one place.
+ *
+ * Contains:
+ * - Selection-based routing to the dashboard, logs, appointments, chat, and
+ *   patient profile views.
+ * - The custom bottom navigation bar anchored with a safe-area inset.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
  */
 import SwiftUI
 

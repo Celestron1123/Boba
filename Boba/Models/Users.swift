@@ -1,8 +1,7 @@
 /**
- * DailyLog.swift
+ * Users.swift
  *
- * Overview: Defines the persisted daily wellness journal entry used to record
- * a patient's mood and reflections.
+ * Overview: Defines the user data model to represent patients and therpists that use the app. 
  *
  * Contains:
  * - A Codable DailyLog model for Firestore serialization.
@@ -13,14 +12,19 @@
  * Attribution: BOBA t team
  * Copyright: Copyright © 2026 BOBA t. All rights reserved.
  */
+
 import FirebaseFirestore
 
-struct DailyLog: Codable {
+enum UserRole: String, Codable {
+    case patient
+    case therapist
+}
+
+struct UserProfile: Codable {
     @DocumentID var id: String?
-    var date: Date
-    var mood: String
-    var tags: [String]
-    //var hydration: Double
-    //var sleep: Double
-    var notes: String
+    var uid: String?
+    var firstName: String?
+    var lastName: String?
+    var role: UserRole?
+    var patientNumber: Int?
 }

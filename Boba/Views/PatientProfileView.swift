@@ -1,6 +1,33 @@
+/**
+ * PatientProfileView.swift
+ *
+ * Overview: Shows the authenticated patient's profile and care information in
+ * a single scrollable screen.
+ *
+ * Contains:
+ * - Firestore-backed identity, birthday, and contact information.
+ * - Provider, emergency-contact, medication, and diagnosis cards.
+ * - Logout confirmation, error handling, and session termination controls.
+ *
+ * Date: September 10, 2026
+ * Attribution: BOBA t team
+ * Copyright: Copyright © 2026 BOBA t. All rights reserved.
+ */
+
 import SwiftUI
+import FirebaseFirestore
 
 struct PatientProfileView: View {
+    @EnvironmentObject private var session: SessionManager
+    @State private var isShowingLogoutConfirmation = false
+    @State private var logoutError: String?
+    @State private var firstName = ""
+    @State private var lastName = ""
+    @State private var email = ""
+    @State private var birthday: Date?
+    @State private var isLoadingProfile = true
+    @State private var profileLoadError: String?
+
     var body: some View {
         ZStack {
             Color.themeSurface.ignoresSafeArea()
@@ -16,6 +43,7 @@ struct PatientProfileView: View {
                         emergencyContactCard
                         medicationsCard
                         diagnosesCard
+                        logoutButton
                         
                         Spacer().frame(height: 120)
                     }
@@ -23,6 +51,22 @@ struct PatientProfileView: View {
                     .padding(.top, 24)
                 }
             }
+        }
+        .confirmationDialog(
+            "Are you sure you want to log out?",
+            isPresented: $isShowingLogoutConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Log Out", role: .destructive, action: handleLogout)
+            Button("Cancel", role: .cancel) { }
+        }
+        .alert("Unable to Log Out", isPresented: isShowingLogoutError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(logoutError ?? "Please try again.")
+        }
+        .task {
+            loadProfile()
         }
     }
     
@@ -44,33 +88,27 @@ struct PatientProfileView: View {
             }
             
             VStack(alignment: .leading, spacing: 8) {
-                Text("Alex Johnson")
-                    .headlineText(size: 32, weight: .heavy)
-                    .foregroundColor(.themeOnSurface)
-                
-                Text("Birthday: April 12, 1994")
-                    .bodyText(size: 16, weight: .medium)
-                    .foregroundColor(.themeOnSurfaceVariant)
-                
-                HStack {
-                    Text("Patient ID: #BOBA-9921")
-                        .bodyText(size: 12, weight: .semibold)
-                        .foregroundColor(.themePrimary)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 6)
-                        .background(Color.themeSurfaceContainerHighest)
-                        .clipShape(Capsule())
-                    
-                    HStack(spacing: 4) {
-                        Image(systemName: "checkmark.seal.fill")
-                        Text("Verified Account")
-                    }
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.themeOnTertiaryContainer)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
-                    .background(Color.themeTertiaryContainer.opacity(0.2))
-                    .clipShape(Capsule())
+                if isLoadingProfile {
+                    ProgressView("Loading profile...")
+                        .tint(.themePrimary)
+                } else {
+                    Text(displayName)
+                        .headlineText(size: 32, weight: .heavy)
+                        .foregroundColor(.themeOnSurface)
+
+                    Text(formattedBirthday)
+                        .bodyText(size: 16, weight: .medium)
+                        .foregroundColor(.themeOnSurfaceVariant)
+
+                    Text(email.isEmpty ? "Email not available" : email)
+                        .bodyText(size: 14)
+                        .foregroundColor(.themeOnSurfaceVariant)
+                }
+
+                if let profileLoadError {
+                    Text(profileLoadError)
+                        .font(.caption)
+                        .foregroundColor(.themeError)
                 }
             }
             Spacer()
@@ -264,6 +302,90 @@ struct PatientProfileView: View {
         .padding(32)
         .glassCard()
     }
+
+    var logoutButton: some View {
+        Button {
+            isShowingLogoutConfirmation = true
+        } label: {
+            Label("Log Out", systemImage: "rectangle.portrait.and.arrow.right")
+                .bodyText(size: 16, weight: .bold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+        }
+        .foregroundColor(.themeError)
+        .background(Color.themeError.opacity(0.08))
+        .cornerRadius(DS.Radius.md)
+        .overlay(
+            RoundedRectangle(cornerRadius: DS.Radius.md)
+                .stroke(Color.themeError.opacity(0.25), lineWidth: 1)
+        )
+    }
+
+    private var isShowingLogoutError: Binding<Bool> {
+        Binding(
+            get: { logoutError != nil },
+            set: { isPresented in
+                if !isPresented {
+                    logoutError = nil
+                }
+            }
+        )
+    }
+
+    private func handleLogout() {
+        logoutError = session.logout()
+    }
+
+    private var displayName: String {
+        let fullName = [firstName, lastName]
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+
+        return fullName.isEmpty ? "Patient" : fullName
+    }
+
+    private var formattedBirthday: String {
+        guard let birthday else {
+            return "Birthday not available"
+        }
+
+        return "Birthday: \(birthday.formatted(date: .long, time: .omitted))"
+    }
+
+    private func loadProfile() {
+        guard let userID = session.currentUserId else {
+            isLoadingProfile = false
+            profileLoadError = "Unable to find the current patient session."
+            return
+        }
+
+        Firestore.firestore()
+            .collection("users")
+            .document(userID)
+            .getDocument { snapshot, error in
+                DispatchQueue.main.async {
+                    isLoadingProfile = false
+
+                    if let error {
+                        profileLoadError = "Unable to load profile: \(error.localizedDescription)"
+                        return
+                    }
+
+                    guard let data = snapshot?.data() else {
+                        profileLoadError = "Patient profile information was not found."
+                        return
+                    }
+
+                    firstName = data["firstName"] as? String
+                        ?? data["username"] as? String
+                        ?? ""
+                    lastName = data["lastName"] as? String ?? ""
+                    email = data["email"] as? String ?? ""
+                    birthday = (data["birthday"] as? Timestamp)?.dateValue()
+                    profileLoadError = nil
+                }
+            }
+    }
     
     func diagnosisTag(name: String, date: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -281,4 +403,3 @@ struct PatientProfileView: View {
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.themeOutlineVariant.opacity(0.1), lineWidth: 1))
     }
 }
-
