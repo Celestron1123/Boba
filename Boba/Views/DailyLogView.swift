@@ -19,6 +19,8 @@ import FirebaseFirestore
 import FirebaseAuth
 
 struct DailyLogView: View {
+    @Environment(\.dismiss) private var dismiss
+    
     @State private var selectedMood: String = ""
     @State private var selectedTags: Set<String> = []
     @State private var journalText: String = ""
@@ -376,6 +378,7 @@ extension DailyLogView {
                         print("Error: \(error.localizedDescription)")
                     } else {
                         print("Successfully saved to sub-collection!")
+                        dismiss()
                     }
                 }
             } catch {
