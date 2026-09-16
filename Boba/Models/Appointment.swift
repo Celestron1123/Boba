@@ -21,4 +21,28 @@ struct Appointment: Codable, Identifiable {
     var therapistId: String?
     var providerName: String
     var startAt: Date
+    var availabilityId: String? = nil
+    var slotId: String? = nil
+    var durationMinutes: Int? = nil
+    var status: String? = nil
+}
+
+struct BookableAppointmentSlot: Identifiable, Equatable {
+    let therapistId: String
+    let availabilityId: String
+    let startAt: Date
+    let durationMinutes: Int
+    let bufferMinutes: Int
+
+    var id: String {
+        "\(availabilityId)_\(Int(startAt.timeIntervalSince1970))"
+    }
+
+    var endAt: Date {
+        Calendar.current.date(
+            byAdding: .minute,
+            value: durationMinutes,
+            to: startAt
+        ) ?? startAt
+    }
 }

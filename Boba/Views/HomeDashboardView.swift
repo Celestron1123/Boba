@@ -15,10 +15,14 @@
  */
 
 import SwiftUI
+import FirebaseFirestore
 
 struct HomeDashboardView: View {
-
+    @EnvironmentObject private var session: SessionManager
     @State private var showDailyLog = false
+    @State private var upcomingAppointments: [Appointment] = []
+    @State private var appointmentError: String?
+    @State private var appointmentListener: ListenerRegistration?
 
     var body: some View {
         ZStack {
@@ -55,6 +59,13 @@ struct HomeDashboardView: View {
         }
         .sheet(isPresented: $showDailyLog) {
             DailyLogView()
+        }
+        .task(id: session.currentUserId) {
+            observeUpcomingAppointments()
+        }
+        .onDisappear {
+            appointmentListener?.remove()
+            appointmentListener = nil
         }
     }
     
@@ -142,41 +153,113 @@ struct HomeDashboardView: View {
                 Text("Next Session")
                     .headlineText(size: 18, weight: .bold)
                 Spacer()
-                Text("TOMORROW")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.themePrimary)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(Color.themePrimaryContainer.opacity(0.2))
-                    .clipShape(Capsule())
-            }
-            
-            HStack(spacing: 16) {
-                Image(systemName: "person.crop.square.fill")
-                    .resizable()
-                    .frame(width: 64, height: 64)
-                    .foregroundColor(.themeSurfaceContainerHighest)
-                    .cornerRadius(12)
-                
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Dr. Sarah Jenkins")
-                        .bodyText(size: 14, weight: .bold)
-                    Text("Cognitive Behavioral")
-                        .bodyText(size: 12)
-                        .foregroundColor(.themeOnSurfaceVariant)
-                    
-                    HStack(spacing: 4) {
-                        Image(systemName: "clock")
-                        Text("2:30 PM")
-                    }
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.themePrimary)
+                if let appointment = upcomingAppointments.first {
+                    Text(relativeDayLabel(for: appointment.startAt))
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundColor(.themePrimary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Color.themePrimaryContainer.opacity(0.2))
+                        .clipShape(Capsule())
                 }
+            }
+
+            if let appointment = upcomingAppointments.first {
+                HStack(spacing: 16) {
+                    Image(systemName: "person.crop.square.fill")
+                        .resizable()
+                        .frame(width: 64, height: 64)
+                        .foregroundColor(.themeSurfaceContainerHighest)
+                        .cornerRadius(12)
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(appointment.providerName)
+                            .bodyText(size: 14, weight: .bold)
+                        Text(Self.dashboardDateFormatter.string(from: appointment.startAt))
+                            .bodyText(size: 12)
+                            .foregroundColor(.themeOnSurfaceVariant)
+
+                        HStack(spacing: 4) {
+                            Image(systemName: "clock")
+                            Text(Self.dashboardTimeFormatter.string(from: appointment.startAt))
+                            if let duration = appointment.durationMinutes {
+                                Text("• \(duration) min")
+                            }
+                        }
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.themePrimary)
+                    }
+                }
+            } else {
+                HStack(spacing: 14) {
+                    Image(systemName: "calendar.badge.clock")
+                        .font(.system(size: 24))
+                        .foregroundStyle(Color.themePrimary)
+                        .frame(width: 52, height: 52)
+                        .background(Color.themePrimaryContainer.opacity(0.25), in: RoundedRectangle(cornerRadius: 12))
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("No upcoming appointment")
+                            .bodyText(size: 14, weight: .bold)
+                        Text("Visit Appointments to choose an available time.")
+                            .bodyText(size: 12)
+                            .foregroundStyle(Color.themeOnSurfaceVariant)
+                    }
+                }
+            }
+
+            if let appointmentError {
+                Text(appointmentError)
+                    .font(.caption)
+                    .foregroundStyle(Color.themeError)
             }
         }
         .padding(24)
         .glassCard()
     }
+
+    private func observeUpcomingAppointments() {
+        appointmentListener?.remove()
+        appointmentListener = nil
+        upcomingAppointments = []
+        appointmentError = nil
+
+        guard let patientId = session.currentUserId else { return }
+        appointmentListener = PatientSchedulingDataService.shared.observeAppointments(patientId: patientId) { appointments, error in
+            DispatchQueue.main.async {
+                if let error {
+                    appointmentError = error.localizedDescription
+                } else {
+                    upcomingAppointments = appointments
+                }
+            }
+        }
+    }
+
+    private func relativeDayLabel(for date: Date) -> String {
+        let calendar = Calendar.current
+        if calendar.isDateInToday(date) { return "TODAY" }
+        if calendar.isDateInTomorrow(date) { return "TOMORROW" }
+        return Self.dashboardBadgeFormatter.string(from: date).uppercased()
+    }
+
+    private static let dashboardDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE, MMMM d"
+        return formatter
+    }()
+
+    private static let dashboardTimeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter
+    }()
+
+    private static let dashboardBadgeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }()
     
     var medicationRemindersCard: some View {
         VStack(alignment: .leading, spacing: 16) {
