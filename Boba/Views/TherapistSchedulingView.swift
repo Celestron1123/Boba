@@ -180,9 +180,11 @@ struct TherapistSchedulingView: View {
         return Button {
             selectedDate = date
         } label: {
-            VStack(spacing: 4) {
+            ZStack(alignment: .bottom) {
                 Text("\(calendar.component(.day, from: date))")
                     .font(.system(size: 14, weight: isSelected ? .bold : .medium))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
                 HStack(spacing: 3) {
                     if hasAppointment {
                         Circle().fill(Color.themeSecondary).frame(width: 4, height: 4)
@@ -191,7 +193,9 @@ struct TherapistSchedulingView: View {
                         Circle().fill(Color.themeTertiary).frame(width: 4, height: 4)
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .center)
                 .frame(height: 4)
+                .padding(.bottom, 3)
             }
             .foregroundStyle(isSelected ? Color.white : Color.themeOnSurface)
             .frame(maxWidth: .infinity)
@@ -527,6 +531,7 @@ private struct AvailabilityEditorSheet: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Close")
         }
+        .padding(.horizontal, 12)
     }
 
     private func sectionHeading(icon: String, title: String, detail: String) -> some View {
@@ -561,6 +566,9 @@ private struct AvailabilityEditorSheet: View {
             Text(title)
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(Color.themeOnSurface)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .layoutPriority(1)
             Spacer()
             picker()
         }
