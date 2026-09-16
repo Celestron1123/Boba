@@ -28,3 +28,24 @@ struct UserProfile: Codable {
     var role: UserRole?
     var patientNumber: Int?
 }
+
+struct PatientProviderConnection: Codable, Identifiable, Equatable {
+    @DocumentID var id: String?
+    var providerId: String
+    var firstName: String
+    var lastName: String
+    var clinicalTitle: String
+    var practiceName: String
+    var specialties: [String]
+
+    var displayName: String {
+        let name = "\(firstName) \(lastName)".trimmingCharacters(in: .whitespacesAndNewlines)
+        return name.isEmpty ? "Your provider" : name
+    }
+
+    var professionalDetails: String {
+        [clinicalTitle, practiceName]
+            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+            .joined(separator: " • ")
+    }
+}

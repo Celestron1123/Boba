@@ -46,6 +46,55 @@ service cloud.firestore {
         allow update: if false;
       }
 
+      match /providers/{providerId} {
+        allow read: if isOwner(userId);
+        allow create: if isTherapist()
+          && request.auth.uid == providerId
+          && request.resource.data.providerId == providerId
+          && existsAfter(/databases/$(database)/documents/users/$(providerId)/connections/$(userId));
+        allow update: if isTherapist()
+          && request.auth.uid == providerId
+          && resource.data.providerId == providerId
+          && request.resource.data.providerId == providerId
+          && existsAfter(/databases/$(database)/documents/users/$(providerId)/connections/$(userId));
+        allow delete: if isTherapist()
+          && request.auth.uid == providerId;
+      }
+
+      match /availability/{availabilityId} {
+        allow read: if signedIn();
+        allow create: if isOwner(userId)
+          && isTherapist()
+          && request.resource.data.therapistId == request.auth.uid
+          && request.resource.data.sessionDurationMinutes in [50, 60]
+          && request.resource.data.bufferMinutes in [0, 10, 15];
+        allow update: if isOwner(userId)
+          && isTherapist()
+          && resource.data.therapistId == request.auth.uid
+          && request.resource.data.therapistId == request.auth.uid
+          && request.resource.data.sessionDurationMinutes in [50, 60]
+          && request.resource.data.bufferMinutes in [0, 10, 15];
+        allow delete: if isOwner(userId)
+          && isTherapist()
+          && resource.data.therapistId == request.auth.uid;
+      }
+
+      // Slot reservations contain no patient information. Their document IDs
+      // let clients hide already-booked times, while getAfter ensures a slot
+      // can only be reserved as part of the same atomic appointment write.
+      match /bookedSlots/{slotId} {
+        allow read: if signedIn();
+        allow create: if signedIn()
+          && request.resource.data.therapistId == userId
+          && request.resource.data.slotId == slotId
+          && getAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.patientId == request.auth.uid
+          && getAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.therapistId == userId
+          && getAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.availabilityId == request.resource.data.availabilityId
+          && getAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.slotId == slotId
+          && getAfter(/databases/$(database)/documents/appointments/$(request.resource.data.appointmentId)).data.startAt == request.resource.data.startAt;
+        allow update, delete: if false;
+      }
+
       match /logs/{logId} {
         allow read: if isOwner(userId) || isConnected(userId);
         allow create: if isOwner(userId);
@@ -86,7 +135,14 @@ service cloud.firestore {
       allow read: if isOwner(resource.data.patientId)
         || isConnected(resource.data.patientId);
       allow create: if signedIn()
-        && request.resource.data.patientId == request.auth.uid;
+        && request.resource.data.patientId == request.auth.uid
+        && request.resource.data.status == "scheduled"
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid)/providers/$(request.resource.data.therapistId))
+        && get(/databases/$(database)/documents/users/$(request.resource.data.therapistId)/availability/$(request.resource.data.availabilityId)).data.therapistId == request.resource.data.therapistId
+        && request.resource.data.startAt >= get(/databases/$(database)/documents/users/$(request.resource.data.therapistId)/availability/$(request.resource.data.availabilityId)).data.startAt
+        && request.resource.data.startAt < get(/databases/$(database)/documents/users/$(request.resource.data.therapistId)/availability/$(request.resource.data.availabilityId)).data.endAt
+        && getAfter(/databases/$(database)/documents/users/$(request.resource.data.therapistId)/bookedSlots/$(request.resource.data.slotId)).data.appointmentId == appointmentId
+        && getAfter(/databases/$(database)/documents/users/$(request.resource.data.therapistId)/bookedSlots/$(request.resource.data.slotId)).data.startAt == request.resource.data.startAt;
       allow update, delete: if isOwner(resource.data.patientId);
     }
   }
