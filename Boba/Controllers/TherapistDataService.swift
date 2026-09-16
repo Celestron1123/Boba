@@ -74,6 +74,60 @@ final class TherapistDataService {
             }
     }
 
+    func observeAvailability(
+        therapistId: String,
+        onChange: @escaping ([TherapistAvailability], Error?) -> Void
+    ) -> ListenerRegistration {
+        db.collection("users")
+            .document(therapistId)
+            .collection("availability")
+            .order(by: "startAt", descending: false)
+            .addSnapshotListener { snapshot, error in
+                let availability = snapshot?.documents.compactMap {
+                    try? $0.data(as: TherapistAvailability.self)
+                } ?? []
+                onChange(availability, error)
+            }
+    }
+
+    func addAvailability(
+        therapistId: String,
+        startAt: Date,
+        endAt: Date,
+        sessionDurationMinutes: Int,
+        bufferMinutes: Int,
+        completion: @escaping (Error?) -> Void
+    ) {
+        let availability = TherapistAvailability(
+            therapistId: therapistId,
+            startAt: startAt,
+            endAt: endAt,
+            sessionDurationMinutes: sessionDurationMinutes,
+            bufferMinutes: bufferMinutes
+        )
+
+        do {
+            try db.collection("users")
+                .document(therapistId)
+                .collection("availability")
+                .addDocument(from: availability, completion: completion)
+        } catch {
+            completion(error)
+        }
+    }
+
+    func deleteAvailability(
+        therapistId: String,
+        availabilityId: String,
+        completion: @escaping (Error?) -> Void
+    ) {
+        db.collection("users")
+            .document(therapistId)
+            .collection("availability")
+            .document(availabilityId)
+            .delete(completion: completion)
+    }
+
     func connectPatient(
         therapistId: String,
         patientNumber: Int,
@@ -96,6 +150,9 @@ final class TherapistDataService {
                 let data = patient.data()
                 let connectionRef = db.collection("users").document(therapistId)
                     .collection("connections").document(patient.documentID)
+                let therapistRef = db.collection("users").document(therapistId)
+                let patientProviderRef = db.collection("users").document(patient.documentID)
+                    .collection("providers").document(therapistId)
                 var connection: [String: Any] = [
                     "patientId": patient.documentID,
                     "patientNumber": patientNumber,
@@ -117,11 +174,28 @@ final class TherapistDataService {
                     } else if existing?.exists == true {
                         completion(.failure(TherapistDataError.alreadyConnected))
                     } else {
-                        connectionRef.setData(connection) { writeError in
-                            if let writeError {
-                                completion(.failure(writeError))
-                            } else {
-                                completion(.success(()))
+                        therapistRef.getDocument { therapistSnapshot, therapistError in
+                            if let therapistError {
+                                completion(.failure(therapistError))
+                                return
+                            }
+
+                            let therapist = therapistSnapshot?.data() ?? [:]
+                            var providerConnection = Self.providerConnectionData(
+                                therapistId: therapistId,
+                                therapist: therapist
+                            )
+                            providerConnection["connectedAt"] = FieldValue.serverTimestamp()
+
+                            let batch = db.batch()
+                            batch.setData(connection, forDocument: connectionRef)
+                            batch.setData(providerConnection, forDocument: patientProviderRef)
+                            batch.commit { writeError in
+                                if let writeError {
+                                    completion(.failure(writeError))
+                                } else {
+                                    completion(.success(()))
+                                }
                             }
                         }
                     }
@@ -134,15 +208,54 @@ final class TherapistDataService {
         patientId: String,
         completion: @escaping (Result<Void, Error>) -> Void
     ) {
-        db.collection("users").document(therapistId)
+        let connectionRef = db.collection("users").document(therapistId)
             .collection("connections").document(patientId)
-            .delete { error in
-                if let error {
-                    completion(.failure(error))
-                } else {
-                    completion(.success(()))
-                }
+        let patientProviderRef = db.collection("users").document(patientId)
+            .collection("providers").document(therapistId)
+        let batch = db.batch()
+        batch.deleteDocument(connectionRef)
+        batch.deleteDocument(patientProviderRef)
+        batch.commit { error in
+            if let error {
+                completion(.failure(error))
+            } else {
+                completion(.success(()))
             }
+        }
+    }
+    /// We can erase this later. This is just for patients who were connected before the new providers' subcollection
+    func syncPatientProviderConnections(
+        therapistId: String,
+        connections: [TherapistPatientConnection],
+        completion: @escaping (Error?) -> Void
+    ) {
+        guard !connections.isEmpty else {
+            completion(nil)
+            return
+        }
+
+        db.collection("users").document(therapistId).getDocument { [db] snapshot, error in
+            if let error {
+                completion(error)
+                return
+            }
+
+            let providerConnection = Self.providerConnectionData(
+                therapistId: therapistId,
+                therapist: snapshot?.data() ?? [:]
+            )
+            let batch = db.batch()
+
+            for connection in connections {
+                let patientProviderRef = db.collection("users")
+                    .document(connection.patientId)
+                    .collection("providers")
+                    .document(therapistId)
+                batch.setData(providerConnection, forDocument: patientProviderRef, merge: true)
+            }
+
+            batch.commit(completion: completion)
+        }
     }
 
     private static func age(from birthday: Date) -> Int {
@@ -244,6 +357,22 @@ final class TherapistDataService {
             providerName: data["providerName"] as? String ?? "Care team"
         )
     }
+
+    nonisolated private static func providerConnectionData(
+        therapistId: String,
+        therapist: [String: Any]
+    ) -> [String: Any] {
+        [
+            "providerId": therapistId,
+            "firstName": therapist["firstName"] as? String ?? "",
+            "lastName": therapist["lastName"] as? String ?? "",
+            "clinicalTitle": therapist["clinicalTitle"] as? String ?? "",
+            "practiceName": therapist["practiceName"] as? String ?? "",
+            "specialties": therapist["practiceSpecialties"] as? [String] ?? [],
+            "status": "active",
+            "updatedAt": FieldValue.serverTimestamp()
+        ]
+    }
 }
 
 @MainActor
@@ -274,6 +403,16 @@ final class TherapistDashboardViewModel: ObservableObject {
                 self.isLoading = false
                 self.errorMessage = error?.localizedDescription
                 self.connections = connections
+                self.service.syncPatientProviderConnections(
+                    therapistId: therapistId,
+                    connections: connections
+                ) { [weak self] syncError in
+                    DispatchQueue.main.async {
+                        if let syncError {
+                            self?.errorMessage = syncError.localizedDescription
+                        }
+                    }
+                }
                 if let selected = self.selectedPatientId,
                    connections.contains(where: { $0.patientId == selected }) {
                     return

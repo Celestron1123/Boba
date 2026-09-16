@@ -10,9 +10,15 @@ struct TherapistContentView: View {
         ZStack {
             Group {
                 if selectedIndex == 0 {
-                    TherapistDashboardView()
-                } else {
+                    TherapistDashboardView {
+                        selectedIndex = 2
+                    }
+                } else if selectedIndex == 1 {
                     TherapistConnectionsView()
+                } else {
+                    TherapistSchedulingView {
+                        selectedIndex = 0
+                    }
                 }
             }
         }
@@ -65,6 +71,9 @@ private struct TherapistBottomNavBar: View {
 }
 
 struct TherapistDashboardView: View {
+    /// Scheduling view is selected
+    let onSchedulingSelected: () -> Void
+
     @EnvironmentObject private var session: SessionManager
     @StateObject private var model = TherapistDashboardViewModel()
     @State private var selectedLog: LogSelection?
@@ -137,10 +146,26 @@ struct TherapistDashboardView: View {
                     .foregroundStyle(Color.themePrimary)
                     .padding(12)
                     .background(Color.themeSurfaceContainerLow, in: Circle())
-                Image(systemName: "person.fill")
-                    .foregroundStyle(.white)
-                    .padding(12)
-                    .background(Color.themePrimary, in: Circle())
+                Menu {
+                    Button {
+                        // Profile destination will be connected when its view is added.
+                    } label: {
+                        Label("Profile", systemImage: "person.crop.circle")
+                    }
+
+                    Button {
+                        onSchedulingSelected()
+                    } label: {
+                        Label("Scheduling", systemImage: "calendar")
+                    }
+                } label: {
+                    Image(systemName: "person.fill")
+                        .foregroundStyle(.white)
+                        .padding(12)
+                        .background(Color.themePrimary, in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Provider menu")
             }
 
             Menu {

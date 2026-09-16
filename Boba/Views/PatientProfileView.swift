@@ -27,6 +27,10 @@ struct PatientProfileView: View {
     @State private var birthday: Date?
     @State private var isLoadingProfile = true
     @State private var profileLoadError: String?
+    @State private var providers: [PatientProviderConnection] = []
+    @State private var isLoadingProviders = true
+    @State private var providerLoadError: String?
+    @State private var providerListener: ListenerRegistration?
 
     var body: some View {
         ZStack {
@@ -67,6 +71,11 @@ struct PatientProfileView: View {
         }
         .task {
             loadProfile()
+            observeProviders()
+        }
+        .onDisappear {
+            providerListener?.remove()
+            providerListener = nil
         }
     }
     
@@ -119,62 +128,95 @@ struct PatientProfileView: View {
     var currentProviderCard: some View {
         VStack(spacing: 24) {
             HStack {
-                Text("Current Provider")
+                Text("Your Care Team")
                     .headlineText(size: 20, weight: .bold)
                     .foregroundColor(.themePrimary)
                 Spacer()
-                Button("Change") { }
-                    .bodyText(size: 14, weight: .bold)
-                    .foregroundColor(.themePrimary)
+                Image(systemName: "checkmark.shield.fill")
+                    .foregroundStyle(Color.themeTertiary)
             }
-            
-            HStack(alignment: .top, spacing: 24) {
-                Image(systemName: "person.crop.square.fill")
-                    .resizable()
-                    .frame(width: 96, height: 96)
-                    .foregroundColor(.themeSurfaceContainerHighest)
-                    .cornerRadius(12)
-                
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Dr. Sarah Chen, PhD")
-                        .headlineText(size: 18, weight: .bold)
-                        .foregroundColor(.themeOnSurface)
-                    
-                    Text("Clinical Psychologist • CBT Specialist")
+
+            if isLoadingProviders {
+                ProgressView("Loading your provider…")
+                    .tint(.themePrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else if providers.isEmpty {
+                VStack(spacing: 12) {
+                    Image(systemName: "person.crop.circle.badge.questionmark")
+                        .font(.system(size: 32))
+                        .foregroundStyle(Color.themePrimary)
+                    Text("No provider connected yet")
+                        .headlineText(size: 17, weight: .bold)
+                    Text("Your provider will appear here after they've connected with you.")
                         .bodyText(size: 14)
-                        .foregroundColor(.themeOnSurfaceVariant)
-                    
-                    HStack {
-                        Image(systemName: "calendar.badge.clock")
-                            .foregroundColor(.themeTertiary)
-                        Text("Next Session: Friday, 10:00 AM")
-                            .bodyText(size: 14, weight: .medium)
-                    }
-                    .padding(.vertical, 4)
-                    
-                    HStack(spacing: 8) {
-                        Button("Message") { }
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color.themePrimary)
-                            .clipShape(Capsule())
-                        
-                        Button("View Notes") { }
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.themeOnSurface)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(Color.themeSurfaceContainerHighest)
-                            .clipShape(Capsule())
-                    }
+                        .foregroundStyle(Color.themeOnSurfaceVariant)
+                        .multilineTextAlignment(.center)
                 }
-                Spacer()
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 12)
+            } else {
+                ForEach(providers) { provider in
+                    providerRow(provider)
+                }
             }
+
+            if let providerLoadError {
+                Text(providerLoadError)
+                    .font(.caption)
+                    .foregroundStyle(Color.themeError)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Text("Provider connections are managed by your care team and are view-only from your account.")
+                .bodyText(size: 12)
+                .foregroundStyle(Color.themeOnSurfaceVariant.opacity(0.72))
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(32)
         .glassCard()
+    }
+
+    private func providerRow(_ provider: PatientProviderConnection) -> some View {
+        HStack(alignment: .top, spacing: 20) {
+            ZStack(alignment: .bottomTrailing) {
+                Image(systemName: "person.crop.square.fill")
+                    .resizable()
+                    .frame(width: 78, height: 78)
+                    .foregroundColor(.themeSurfaceContainerHighest)
+                    .cornerRadius(12)
+
+                Circle()
+                    .fill(Color.themeTertiary)
+                    .frame(width: 18, height: 18)
+                    .overlay(Circle().stroke(Color.themeSurface, lineWidth: 2))
+            }
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(provider.displayName)
+                    .headlineText(size: 18, weight: .bold)
+                    .foregroundColor(.themeOnSurface)
+
+                if !provider.professionalDetails.isEmpty {
+                    Text(provider.professionalDetails)
+                        .bodyText(size: 14)
+                        .foregroundColor(.themeOnSurfaceVariant)
+                }
+
+                if !provider.specialties.isEmpty {
+                    Text(provider.specialties.prefix(2).joined(separator: " • "))
+                        .bodyText(size: 12, weight: .medium)
+                        .foregroundStyle(Color.themeTertiary)
+                }
+
+                Label("Connected provider", systemImage: "link")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Color.themePrimary)
+            }
+
+            Spacer()
+        }
+        .padding(16)
+        .background(Color.themeSurfaceContainerLow.opacity(0.65), in: RoundedRectangle(cornerRadius: DS.Radius.md))
     }
     
     var emergencyContactCard: some View {
@@ -383,6 +425,34 @@ struct PatientProfileView: View {
                     email = data["email"] as? String ?? ""
                     birthday = (data["birthday"] as? Timestamp)?.dateValue()
                     profileLoadError = nil
+                }
+            }
+    }
+
+    private func observeProviders() {
+        guard providerListener == nil, let userID = session.currentUserId else {
+            isLoadingProviders = false
+            return
+        }
+
+        providerListener = Firestore.firestore()
+            .collection("users")
+            .document(userID)
+            .collection("providers")
+            .addSnapshotListener { snapshot, error in
+                DispatchQueue.main.async {
+                    isLoadingProviders = false
+
+                    if let error {
+                        providerLoadError = "Unable to load your provider: \(error.localizedDescription)"
+                        return
+                    }
+
+                    providers = snapshot?.documents.compactMap {
+                        try? $0.data(as: PatientProviderConnection.self)
+                    }
+                    .sorted { $0.displayName < $1.displayName } ?? []
+                    providerLoadError = nil
                 }
             }
     }

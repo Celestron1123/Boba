@@ -46,6 +46,39 @@ service cloud.firestore {
         allow update: if false;
       }
 
+      match /providers/{providerId} {
+        allow read: if isOwner(userId);
+        allow create: if isTherapist()
+          && request.auth.uid == providerId
+          && request.resource.data.providerId == providerId
+          && existsAfter(/databases/$(database)/documents/users/$(providerId)/connections/$(userId));
+        allow update: if isTherapist()
+          && request.auth.uid == providerId
+          && resource.data.providerId == providerId
+          && request.resource.data.providerId == providerId
+          && existsAfter(/databases/$(database)/documents/users/$(providerId)/connections/$(userId));
+        allow delete: if isTherapist()
+          && request.auth.uid == providerId;
+      }
+
+      match /availability/{availabilityId} {
+        allow read: if signedIn();
+        allow create: if isOwner(userId)
+          && isTherapist()
+          && request.resource.data.therapistId == request.auth.uid
+          && request.resource.data.sessionDurationMinutes in [50, 60]
+          && request.resource.data.bufferMinutes in [0, 10, 15];
+        allow update: if isOwner(userId)
+          && isTherapist()
+          && resource.data.therapistId == request.auth.uid
+          && request.resource.data.therapistId == request.auth.uid
+          && request.resource.data.sessionDurationMinutes in [50, 60]
+          && request.resource.data.bufferMinutes in [0, 10, 15];
+        allow delete: if isOwner(userId)
+          && isTherapist()
+          && resource.data.therapistId == request.auth.uid;
+      }
+
       match /logs/{logId} {
         allow read: if isOwner(userId) || isConnected(userId);
         allow create: if isOwner(userId);
