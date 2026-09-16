@@ -14,62 +14,71 @@
  * Copyright: Copyright © 2026 BOBA t. All rights reserved.
  */
 
-import SwiftUI
-import FirebaseFirestore
 import FirebaseAuth
+import FirebaseFirestore
+import SwiftUI
 
 struct DailyLogView: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     @State private var selectedMood: String = ""
     @State private var selectedTags: Set<String> = []
     @State private var journalText: String = ""
-    @State private var hydrationLevel: Double = 1.2
-    @State private var sleepHours: Double = 7.0
     @State private var isSubmitting: Bool = false
+    @State private var isShowingGoalCreation: Bool = false
+    @State private var customGoals: [GoalCreation] = []
+
     @EnvironmentObject var session: SessionManager
-    
+    @State private var isLoadingGoals: Bool = false
+
     private let moodOptions: [MoodOption] = [
         .init(key: "AWFUL", icon: "face.terrible", color: .moodTerrible),
         .init(key: "BAD", icon: "face.sad", color: .moodBad),
         .init(key: "OKAY", icon: "face.okay", color: .moodOkay),
         .init(key: "GOOD", icon: "face.good", color: .moodGood),
-        .init(key: "GREAT", icon: "face.great", color: .moodGreat)
+        .init(key: "GREAT", icon: "face.great", color: .moodGreat),
     ]
-    
+
     private var moodColumns: [GridItem] {
         [GridItem(.adaptive(minimum: 92, maximum: 140), spacing: 12)]
     }
-    
+
     var body: some View {
         ZStack {
             Color.themeSurface.ignoresSafeArea()
-            
+
             Circle()
                 .fill(Color.themeTertiaryContainer.opacity(0.1))
                 .frame(width: 300, height: 300)
                 .blur(radius: 80)
                 .position(x: 50, y: 800)
-            
+
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 40) {
                     moodSelectorSection
                     emotionTagsSection
                     trackersSection
                     noteSection
-                    
+
                     Button(action: { submitLog() }) {
-                        Text(isSubmitting ? "SUBMITTING..." : "SUBMIT DAILY LOG")
-                            .headlineText(size: 18, weight: .heavy)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 20)
-                            .background(Color.primaryGradient)
-                            .clipShape(Capsule())
-                            .shadow(color: .themePrimary.opacity(0.2), radius: 20, x: 0, y: 10)
+                        Text(
+                            isSubmitting ? "SUBMITTING..." : "SUBMIT DAILY LOG"
+                        )
+                        .headlineText(size: 18, weight: .heavy)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 20)
+                        .background(Color.primaryGradient)
+                        .clipShape(Capsule())
+                        .shadow(
+                            color: .themePrimary.opacity(0.2),
+                            radius: 20,
+                            x: 0,
+                            y: 10
+                        )
                     }
                     .disabled(isSubmitting)
-                    
+
                     Spacer().frame(height: 120)
                 }
                 .padding(.horizontal, 24)
@@ -77,7 +86,7 @@ struct DailyLogView: View {
             }
         }
     }
-    
+
     var moodSelectorSection: some View {
         VStack(alignment: .leading, spacing: 20) {
             VStack(alignment: .leading, spacing: 4) {
@@ -87,14 +96,16 @@ struct DailyLogView: View {
                     .bodyText(size: 18)
                     .foregroundColor(.themeOnSurfaceVariant)
             }
-            
+
             LazyVGrid(columns: moodColumns, spacing: 12) {
                 ForEach(moodOptions) { mood in
                     MoodCard(
                         mood: mood,
                         isSelected: selectedMood == mood.key
                     ) {
-                        withAnimation(.spring(response: 0.25, dampingFraction: 0.85)) {
+                        withAnimation(
+                            .spring(response: 0.25, dampingFraction: 0.85)
+                        ) {
                             selectedMood = mood.key
                         }
                     }
@@ -109,7 +120,7 @@ struct DailyLogView: View {
             )
         }
     }
-    
+
     var emotionTagsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 8) {
@@ -119,27 +130,52 @@ struct DailyLogView: View {
                     .bodyText(size: 14)
                     .foregroundColor(.themeOnSurfaceVariant)
             }
-            
+
             let tags = [
                 ("Calm", Color.themeTertiary, Color.themeTertiary.opacity(0.1)),
-                ("Grateful", Color.themeOnSecondaryContainer, Color.themeSecondaryContainer),
-                ("Anxious", Color.themeOnSurfaceVariant, Color.themeSurfaceContainerHighest),
-                ("Energetic", Color.themeOnSurfaceVariant, Color.themeSurfaceContainerHighest),
-                ("Frustrated", Color.themeOnErrorContainer, Color.themeErrorContainer),
-                ("Lonely", Color.themeOnSurfaceVariant, Color.themeSurfaceContainerHighest),
-                ("Inspired", Color.themeOnPrimaryContainer, Color.themePrimaryContainer),
-                ("Tired", Color.themeOnSurfaceVariant, Color.themeSurfaceContainerHighest)
+                (
+                    "Grateful", Color.themeOnSecondaryContainer,
+                    Color.themeSecondaryContainer
+                ),
+                (
+                    "Anxious", Color.themeOnSurfaceVariant,
+                    Color.themeSurfaceContainerHighest
+                ),
+                (
+                    "Energetic", Color.themeOnSurfaceVariant,
+                    Color.themeSurfaceContainerHighest
+                ),
+                (
+                    "Frustrated", Color.themeOnErrorContainer,
+                    Color.themeErrorContainer
+                ),
+                (
+                    "Lonely", Color.themeOnSurfaceVariant,
+                    Color.themeSurfaceContainerHighest
+                ),
+                (
+                    "Inspired", Color.themeOnPrimaryContainer,
+                    Color.themePrimaryContainer
+                ),
+                (
+                    "Tired", Color.themeOnSurfaceVariant,
+                    Color.themeSurfaceContainerHighest
+                ),
             ]
-            
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 12) {
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100))], spacing: 12)
+            {
                 ForEach(tags, id: \.0) { tag in
                     let isSelected = selectedTags.contains(tag.0)
-                    
+
                     Button(action: {
                         toggleTag(tag.0)
                     }) {
                         Text(tag.0)
-                            .bodyText(size: 14, weight: isSelected ? .bold : .medium)
+                            .bodyText(
+                                size: 14,
+                                weight: isSelected ? .bold : .medium
+                            )
                             .foregroundColor(isSelected ? .white : tag.1)
                             .padding(.horizontal, 20)
                             .padding(.vertical, 10)
@@ -149,152 +185,71 @@ struct DailyLogView: View {
                             .clipShape(Capsule())
                             .overlay(
                                 Capsule()
-                                    .stroke(isSelected ? Color.themePrimary : Color.clear, lineWidth: 1.5)
+                                    .stroke(
+                                        isSelected
+                                            ? Color.themePrimary : Color.clear,
+                                        lineWidth: 1.5
+                                    )
                             )
                             .scaleEffect(isSelected ? 1.05 : 1.0)
                     }
                     .buttonStyle(.plain)
-                    .animation(.spring(response: 0.2, dampingFraction: 0.7), value: isSelected)
+                    .animation(
+                        .spring(response: 0.2, dampingFraction: 0.7),
+                        value: isSelected
+                    )
                 }
             }
         }
     }
-    
+
     var trackersSection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Wellness Trackers")
-                .headlineText(size: 20, weight: .bold)
-            
-            HStack(spacing: 16) {
-                trackerCard(
-                    icon: "drop.fill",
-                    iconColor: .themeTertiaryContainer,
-                    value: "1.2",
-                    unit: "L",
-                    title: "HYDRATION",
-                    progress: min(hydrationLevel / 2.5, 1.0),
-                    progressGradient: LinearGradient(
-                        colors: [.themeTertiaryContainer, .themeTertiary],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    onDecrement: {
-                        if hydrationLevel >= 0.1 { hydrationLevel -= 0.1 }
-                    },
-                    onIncrement: {
-                        if hydrationLevel < 5.0 { hydrationLevel += 0.1 }
-                    }
-                )
-                
-                trackerCard(
-                    icon: "moon.fill",
-                    iconColor: .themeSecondary,
-                    value: "7.5",
-                    unit: "hrs",
-                    title: "SLEEP QUALITY",
-                    progress: min(sleepHours / 9.0, 1.0),
-                    progressGradient: LinearGradient(
-                        colors: [.themeSecondaryContainer, .themeSecondary],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    ),
-                    onDecrement: {
-                        if sleepHours >= 0.5 { sleepHours -= 0.5 }
-                    },
-                    onIncrement: {
-                        if sleepHours < 16.0 { sleepHours += 0.5 }
-                    }
-                )
-            }
-        }
-    }
-    
-    func trackerCard(
-        icon: String,
-        iconColor: Color,
-        value: String,
-        unit: String,
-        title: String,
-        progress: Double,
-        progressGradient: LinearGradient,
-        onDecrement: @escaping () -> Void,
-        onIncrement: @escaping () -> Void
-    ) -> some View {
-        VStack(alignment: .leading) {
-            HStack(alignment: .top) {
-                Image(systemName: icon)
-                    .font(.system(size: 24))
-                    .foregroundColor(iconColor)
-                
+            HStack(alignment: .center) {
+                Text("Wellness Trackers")
+                    .headlineText(size: 20, weight: .bold)
+
                 Spacer()
-                
-                HStack(spacing: 0) {
-                    Text(value)
-                        .font(.system(size: 24, weight: .bold))
-                    Text(unit)
-                        .font(.system(size: 14))
-                        .foregroundColor(.themeOnSurfaceVariant.opacity(0.6))
+
+                Button(action: { isShowingGoalCreation = true }) {
+                    Label("Add Goal", systemImage: "plus")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.themePrimary)
                 }
             }
-            
-            HStack(spacing: 12) {
-                Button(action: onDecrement) {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.themeOnSurfaceVariant.opacity(0.7))
-                }
-                
-                Spacer()
-                
-                Button(action: onIncrement) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 20))
-                        .foregroundColor(.themeOnSurfaceVariant.opacity(0.7))
-                }
-            }
-            .buttonStyle(.plain)
-            .padding(.vertical, 4)
-            
-            VStack(spacing: 8) {
-                HStack {
-                    Text(title)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.themeOnSurfaceVariant.opacity(0.8))
-                    Spacer()
-                    Text("\(Int(progress * 100))%")
-                }
-                .font(.system(size: 10, weight: .bold))
-                .tracking(1)
-                .foregroundColor(.themeOnSurfaceVariant.opacity(0.8))
-                
-                GeometryReader { geo in
-                    Capsule()
-                        .fill(Color.themeSurfaceContainer)
-                        .frame(height: 12)
-                        .overlay(
-                            Capsule()
-                                .fill(progressGradient)
-                                .frame(width: geo.size.width * CGFloat(progress)),
-                            alignment: .leading
+
+            ForEach($customGoals) { $goal in
+                VStack {
+                    HStack {
+                        Image(systemName: goal.systemImage)
+                            .foregroundColor(.themePrimary)
+                        Text(goal.title)
+                        Spacer()
+
+                        // Dynamic input field for this goal
+                        TextField(
+                            "0",
+                            value: $goal.targetValue,
+                            format: .number
                         )
+                        .keyboardType(.decimalPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 60)
+                        Text(goal.unit)
+                            .foregroundColor(.themeOnSurfaceVariant)
+                    }
+                    .padding()
+                    .glassCard()
                 }
-                .frame(height: 12)
             }
         }
-        .padding(20)
-        .frame(height: 160)
-        .glassCard()
-        .overlay(
-            RoundedRectangle(cornerRadius: DS.Radius.lg)
-                .stroke(Color.white.opacity(0.3), lineWidth: 1)
-        )
     }
-    
+
     var noteSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Journaling thoughts")
                 .headlineText(size: 20, weight: .bold)
-            
+
             ZStack(alignment: .bottomTrailing) {
                 TextEditor(text: $journalText)
                     .font(.system(size: 16))
@@ -303,12 +258,21 @@ struct DailyLogView: View {
                     .frame(height: 160)
                     .background(Color.white.opacity(0.4))
                     .glassCard()
-                
+
                 Text("SAFE SPACE")
                     .font(.system(size: 10, weight: .bold))
                     .tracking(1)
                     .foregroundColor(.themeOnSurfaceVariant.opacity(0.4))
                     .padding(16)
+            }
+            .onAppear {
+                fetchPersistedGoals()
+            }
+        }
+        .sheet(isPresented: $isShowingGoalCreation) {
+            GoalCreationView { createdGoal in
+                customGoals.append(createdGoal)
+                saveGoalToUserProfile(createdGoal)
             }
         }
     }
@@ -325,7 +289,7 @@ private struct MoodCard: View {
     let mood: MoodOption
     let isSelected: Bool
     let action: () -> Void
-    
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 10) {
@@ -341,18 +305,24 @@ private struct MoodCard: View {
                     )
                     .overlay(
                         Circle()
-                            .stroke(isSelected ? Color.themePrimary : Color.clear, lineWidth: 2)
+                            .stroke(
+                                isSelected ? Color.themePrimary : Color.clear,
+                                lineWidth: 2
+                            )
                     )
                     .shadow(
-                        color: isSelected ? Color.themePrimary.opacity(0.20) : .clear,
+                        color: isSelected
+                            ? Color.themePrimary.opacity(0.20) : .clear,
                         radius: 10,
                         x: 0,
                         y: 4
                     )
-                
+
                 Text(mood.key)
                     .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(isSelected ? .themeOnSurface : .themeOnSurfaceVariant)
+                    .foregroundColor(
+                        isSelected ? .themeOnSurface : .themeOnSurfaceVariant
+                    )
                     .tracking(1)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
@@ -361,48 +331,117 @@ private struct MoodCard: View {
             .padding(.vertical, 8)
             .background(
                 RoundedRectangle(cornerRadius: DS.Radius.md)
-                    .fill(isSelected ? mood.color.opacity(0.25) : Color.themeSurfaceContainerLow.opacity(0.55))
+                    .fill(
+                        isSelected
+                            ? mood.color.opacity(0.25)
+                            : Color.themeSurfaceContainerLow.opacity(0.55)
+                    )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: DS.Radius.md)
                     .stroke(
-                        isSelected ? Color.themePrimary.opacity(0.45) : Color.white.opacity(0.35),
+                        isSelected
+                            ? Color.themePrimary.opacity(0.45)
+                            : Color.white.opacity(0.35),
                         lineWidth: isSelected ? 1.5 : 1
                     )
             )
             .scaleEffect(isSelected ? 1.02 : 1.0)
-            .animation(.spring(response: 0.25, dampingFraction: 0.85), value: isSelected)
+            .animation(
+                .spring(response: 0.25, dampingFraction: 0.85),
+                value: isSelected
+            )
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Mood \(mood.key)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
+
 }
 
 extension DailyLogView {
-    func submitLog() {
-        guard let userId = session.currentUserId else {
-                print("No manual session found")
+    /// Fetches the user's saved goal templates from their user document
+    func fetchPersistedGoals() {
+        guard let userId = session.currentUserId else { return }
+        isLoadingGoals = true
+
+        let db = Firestore.firestore()
+        db.collection("users").document(userId).getDocument { snapshot, error in
+            isLoadingGoals = false
+            guard let snapshot = snapshot, snapshot.exists,
+                let data = snapshot.data(),
+                let rawGoals = data["persistedGoals"] as? [[String: Any]]
+            else {
                 return
             }
-        
+
+            do {
+                let jsonData = try JSONSerialization.data(
+                    withJSONObject: rawGoals
+                )
+                let decodedGoals = try JSONDecoder().decode(
+                    [GoalCreation].self,
+                    from: jsonData
+                )
+                DispatchQueue.main.async {
+                    self.customGoals = decodedGoals
+                }
+            } catch {
+                print("Error decoding saved goals: \(error)")
+            }
+        }
+    }
+
+    /// Saves newly added goals to the user's profile document so they persist for future logs
+    func saveGoalToUserProfile(_ newGoal: GoalCreation) {
+        guard let userId = session.currentUserId else { return }
+
+        let db = Firestore.firestore()
+
+        do {
+            let data = try JSONEncoder().encode(newGoal)
+            if let dict = try JSONSerialization.jsonObject(with: data)
+                as? [String: Any]
+            {
+                db.collection("users").document(userId).setData(
+                    [
+                        "persistedGoals": FieldValue.arrayUnion([dict])
+                    ],
+                    merge: true
+                ) { error in
+                    if let error = error {
+                        print("Failed to persist goal profile: \(error)")
+                    }
+                }
+            }
+        } catch {
+            print("Error encoding goal for persistence: \(error)")
+        }
+    }
+
+    func submitLog() {
+        guard let userId = session.currentUserId else {
+            print("No manual session found")
+            return
+        }
+
         // Prevent double-submissions
         guard !isSubmitting else { return }
         isSubmitting = true
-        
+
         let newLog = DailyLog(
             date: Date(),
             mood: selectedMood,
             tags: Array(selectedTags),
-            hydration: hydrationLevel,
-            sleep: sleepHours,
+            goals: customGoals,
             notes: journalText
         )
-        
+
         let db = Firestore.firestore()
-        
+
         do {
-                try db.collection("users").document(userId).collection("logs").addDocument(from: newLog) { error in
+            try db.collection("users").document(userId).collection("logs")
+                .addDocument(from: newLog) { error in
                     isSubmitting = false
                     if let error = error {
                         print("Error: \(error.localizedDescription)")
@@ -411,17 +450,17 @@ extension DailyLogView {
                         dismiss()
                     }
                 }
-            } catch {
-                print("Error encoding log: \(error)")
-                isSubmitting = false
-            }
-    }
-    
-    fileprivate func toggleTag(_ tag: String) {
-            if selectedTags.contains(tag) {
-                selectedTags.remove(tag)
-            } else {
-                selectedTags.insert(tag)
-            }
+        } catch {
+            print("Error encoding log: \(error)")
+            isSubmitting = false
         }
+    }
+
+    fileprivate func toggleTag(_ tag: String) {
+        if selectedTags.contains(tag) {
+            selectedTags.remove(tag)
+        } else {
+            selectedTags.insert(tag)
+        }
+    }
 }
